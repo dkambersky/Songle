@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Songs timestamp="2017-10-09T10:00:33.775+01:00[Europe/London]"
+       root="http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/">
+  <Song>
+    <Number>01</Number>
+    <Artist>Queen</Artist>
+    <Title>Bohemian Rhapsody</Title>
+    <Link>https://youtu.be/fJ9rUzIMcZQ</Link>
+  </Song>
+  <Song>
+    <Number>02</Number>
+    <Artist>Blur</Artist>
+    <Title>Song 2</Title>
+    <Link>https://youtu.be/SSbBvKaM6sk</Link>
+  </Song>
+  <Song>
+    <Number>03</Number>
+    <Artist>The Clash</Artist>
+    <Title>I Fought the Law</Title>
+    <Link>https://youtu.be/AL8chWFuM-s</Link>
+  </Song>
+  <Song>
+    <Number>04</Number>
+    <Artist>Nirvana</Artist>
+    <Title>Smells Like Teen Spirit</Title>
+    <Link>https://youtu.be/hTWKbfoikeg</Link>
+  </Song>
+  <Song>
+    <Number>05</Number>
+    <Artist>David Bowie</Artist>
+    <Title>Life On Mars?</Title>
+    <Link>https://youtu.be/v--IqqusnNQ</Link>
+  </Song>
+  <Song>
+    <Number>06</Number>
+    <Artist>Sinead O'Connor</Artist>
+    <Title>Nothing Compares 2 U</Title>
+    <Link>https://youtu.be/SJwb_KXWsbk</Link>
+  </Song>
+  <Song>
+    <Number>07</Number>
+    <Artist>Lou Reed</Artist>
+    <Title>Perfect Day</Title>
+    <Link>https://youtu.be/9wxI4KK9ZYo</Link>
+  </Song>
+  <Song>
+    <Number>08</Number>
+    <Artist>Leonard Cohen</Artist>
+    <Title>Hallelujah</Title>
+    <Link>https://youtu.be/YrLk4vdY28Q</Link>
+  </Song>
+  <Song>
+    <Number>09</Number>
+    <Artist>Blondie</Artist>
+    <Title>Heart of Glass</Title>
+    <Link>https://youtu.be/WGU_4-5RaxU</Link>
+  </Song>
+  <Song>
+    <Number>10</Number>
+    <Artist>Madonna</Artist>
+    <Title>Vogue</Title>
+    <Link>https://youtu.be/GuJQSAiODqI</Link>
+  </Song>
+  <Song>
+    <Number>11</Number>
+    <Artist>The Killers</Artist>
+    <Title>Mr. Brightside</Title>
+    <Link>https://youtu.be/gGdGFtwCNBE</Link>
+  </Song>
+  <Song>
+    <Number>12</Number>
+    <Artist>Joni Mitchell</Artist>
+    <Title>Both Sides Now</Title>
+    <Link>https://youtu.be/aCnf46boC3I</Link>
+  </Song>
+  <Song>
+    <Number>13</Number>
+    <Artist>George Harrison</Artist>
+    <Title>Here Comes the Sun</Title>
+    <Link>https://youtu.be/GwmVfewqu7I</Link>
+  </Song>
+  <Song>
+    <Number>14</Number>
+    <Artist>The Proclaimers</Artist>
+    <Title>I'm Gonna Be (500 Miles)</Title>
+    <Link>https://youtu.be/tbNlMtqrYS0</Link>
+  </Song>
+  <Song>
+    <Number>15</Number>
+    <Artist>Pink Floyd</Artist>
+    <Title>Another Brick In The Wall, Part Two</Title>
+    <Link>https://youtu.be/HrxX9TBj2zY</Link>
+  </Song>
+  <Song>
+    <Number>16</Number>
+    <Artist>Joy Division</Artist>
+    <Title>Love Will Tear Us Apart</Title>
+    <Link>https://youtu.be/zuuObGsB0No</Link>
+  </Song>
+  <Song>
+    <Number>17</Number>
+    <Artist>REM</Artist>
+    <Title>It's The End Of The World As We Know It (And I Feel Fine)</Title>
+    <Link>https://youtu.be/Z0GFRcFm-aY</Link>
+  </Song>
+  <Song>
+    <Number>18</Number>
+    <Artist>The White Stripes</Artist>
+    <Title>Seven Nation Army</Title>
+    <Link>https://youtu.be/0J2QdDbelmY</Link>
+  </Song>
+</Songs>

@@ -5,17 +5,12 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
-import kotlinx.android.synthetic.main.activity_main_screen.*
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 class MainScreenActivity : AppCompatActivity() {
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar
-        fullscreen_content.systemUiVisibility =
+//        fullscreen_content.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LOW_PROFILE or
                         View.SYSTEM_UI_FLAG_FULLSCREEN or
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
@@ -26,21 +21,10 @@ class MainScreenActivity : AppCompatActivity() {
     private val mShowPart2Runnable = Runnable {
         // Delayed display of UI elements
         supportActionBar?.show()
-        fullscreen_content_controls.visibility = View.VISIBLE
+
     }
     private var mVisible: Boolean = false
     private val mHideRunnable = Runnable { hide() }
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private val mDelayHideTouchListener = View.OnTouchListener { _, _ ->
-        if (AUTO_HIDE) {
-            delayedHide(AUTO_HIDE_DELAY_MILLIS)
-        }
-        false
-    }
 
     private val StartGameListener = View.OnTouchListener { _, _ ->
         startGame()
@@ -60,10 +44,12 @@ class MainScreenActivity : AppCompatActivity() {
 
         mVisible = true
 
+        hide()
+        enterFullscreen()
         // Set up the user interaction to manually show or hide the system UI.
-        fullscreen_content.setOnClickListener { toggle() }
+//        fullscreen_content.setOnClickListener { toggle() }
 
-          dummy_button.setOnTouchListener(StartGameListener)
+//          dummy_button.setOnTouchListener(StartGameListener)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -86,7 +72,7 @@ class MainScreenActivity : AppCompatActivity() {
     private fun hide() {
         // Hide UI first
         supportActionBar?.hide()
-        fullscreen_content_controls.visibility = View.GONE
+//        fullscreen_content_controls.visibility = View.GONE
         mVisible = false
 
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -96,7 +82,7 @@ class MainScreenActivity : AppCompatActivity() {
 
     private fun show() {
         // Show the system bar
-        fullscreen_content.systemUiVisibility =
+//        fullscreen_content.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                         View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         mVisible = true
@@ -104,6 +90,17 @@ class MainScreenActivity : AppCompatActivity() {
         // Schedule a runnable to display UI elements after a delay
         mHideHandler.removeCallbacks(mHidePart2Runnable)
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY.toLong())
+    }
+
+    private fun enterFullscreen(){
+        val decorView = window.decorView ?: return
+        // Hide the status bar.
+        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+        decorView.systemUiVisibility = uiOptions
+    // Remember that you should never show the action bar if the
+    // status bar is hidden, so hide that too if necessary.
+        val actionBar = actionBar
+        actionBar?.hide()
     }
 
     /**
