@@ -11,11 +11,7 @@ import kotlinx.android.synthetic.main.activity_main_screen.*
 
 class MainScreenActivity : AppCompatActivity() {
 
-    override fun onResume() {
-        super.onResume()
-        enterFullscreen()
-    }
-
+    /* Overridden control methods */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -33,14 +29,16 @@ class MainScreenActivity : AppCompatActivity() {
 
     }
 
-
+    /* UI Manipulation */
     private fun enterFullscreen() {
+
         val decorView = window.decorView ?: return
-        // Hide the status bar.
+
         val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
         decorView.systemUiVisibility = uiOptions
         val actionBar = actionBar
         actionBar?.hide()
+        supportActionBar?.hide()
     }
 
 
