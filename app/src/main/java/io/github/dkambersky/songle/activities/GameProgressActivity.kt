@@ -1,19 +1,17 @@
 package io.github.dkambersky.songle.activities
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import io.github.dkambersky.songle.InGameActivity
 import io.github.dkambersky.songle.R
 import kotlinx.android.synthetic.main.activity_game_progress.*
 
-class GameProgressActivity : AppCompatActivity() {
+class GameProgressActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_progress)
         setSupportActionBar(toolbar)
-
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        backButton.setOnTouchListener({_,_ -> transition(InGameActivity::class.java)})
     }
 
 }
