@@ -90,5 +90,6 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_pre_game">PreGameActivity</string>
     <string name="title_activity_game_progress">GameProgressActivity</string>
+    <string name="title_activity_game_summary">GameSummaryActivity</string>
 
 </resources>

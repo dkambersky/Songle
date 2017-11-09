@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS NETWORK STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -17,10 +17,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <!-- <activity -->
-        <!-- android:name=".activities.InGameActivity" -->
-        <!-- android:label="@string/title_activity_in_game" -->
-        <!-- android:launchMode="singleTop" /> -->
+
         <activity
             android:name=".activities.MainScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -72,8 +69,14 @@
             <!-- android:value="io.github.dkambersky.songle.activities.InGameActivity" /> -->
         </activity>
         <activity
-            android:name=".InGameActivity"
-            android:label="@string/title_activity_in_game"></activity>
+            android:name=".activities.InGameActivity"
+            android:label="@string/title_activity_in_game" />
+        <activity
+            android:name=".activities.GameSummaryActivity"
+            android:label="@string/title_activity_game_summary"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <service android:name=".services.BackgroundService" />
     </application>
 
 </manifest>

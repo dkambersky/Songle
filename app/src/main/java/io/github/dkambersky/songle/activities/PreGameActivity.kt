@@ -1,7 +1,6 @@
 package io.github.dkambersky.songle.activities
 
 import android.os.Bundle
-import io.github.dkambersky.songle.InGameActivity
 import io.github.dkambersky.songle.R
 import kotlinx.android.synthetic.main.activity_pre_game.*
 
