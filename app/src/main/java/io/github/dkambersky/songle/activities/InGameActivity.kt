@@ -1,8 +1,6 @@
 package io.github.dkambersky.songle.activities
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -11,7 +9,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.dkambersky.songle.R
 
-class IngameActivity : AppCompatActivity(), OnMapReadyCallback {
+class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 

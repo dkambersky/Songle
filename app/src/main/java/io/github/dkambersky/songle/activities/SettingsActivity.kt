@@ -17,6 +17,9 @@ import android.preference.RingtonePreference
 import android.text.TextUtils
 import android.view.MenuItem
 import android.support.v4.app.NavUtils
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import io.github.dkambersky.songle.R
 
 /**
@@ -31,17 +34,24 @@ import io.github.dkambersky.songle.R
  */
 class SettingsActivity : AppCompatPreferenceActivity() {
 
+    /* Keep consistent fullscreen */
+    private fun enterFullscreen() {
+//            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            window.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+            actionBar?.hide()
+            supportActionBar?.hide()
+        }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupActionBar()
+        enterFullscreen()
+
     }
 
-    /**
-     * Set up the [android.app.ActionBar], if the API is available.
-     */
-    private fun setupActionBar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
 
     override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean {
         val id = item.itemId
