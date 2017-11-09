@@ -17,10 +17,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".activities.InGameActivity"
-            android:label="@string/title_activity_in_game"
-            android:launchMode="singleTop" />
+        <!--<activity-->
+            <!--android:name=".activities.InGameActivity"-->
+            <!--android:label="@string/title_activity_in_game"-->
+            <!--android:launchMode="singleTop" />-->
         <activity
             android:name=".activities.MainScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -62,11 +62,12 @@
         <activity
             android:name=".activities.GameProgressActivity"
             android:label="@string/title_activity_game_progress"
-            android:parentActivityName=".activities.InGameActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.github.dkambersky.songle.activities.InGameActivity" />
+        <!--android:parentActivityName=".activities.InGameActivity"-->
+
+            <!--<meta-data-->
+                <!--android:name="android.support.PARENT_ACTIVITY"-->
+                <!--android:value="io.github.dkambersky.songle.activities.InGameActivity" />-->
         </activity>
     </application>
 

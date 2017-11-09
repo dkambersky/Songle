@@ -13,7 +13,7 @@ class MainScreenActivity : BaseActivity() {
         setContentView(R.layout.activity_main_screen)
 
         /* Register listeners */
-        b_newGame.setOnTouchListener({ _, _ -> transition(InGameActivity::class.java) })
+//        b_newGame.setOnTouchListener({ _, _ -> transition(InGameActivity::class.java) })
         b_settings.setOnTouchListener({ _, _ -> transition(SettingsActivity::class.java) })
         b_about.setOnTouchListener({ _, _ -> transition(AboutActivity::class.java) })
     }
