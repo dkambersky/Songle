@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
@@ -47,6 +48,18 @@ class BaseActivity : AppCompatActivity() {
         startActivity(intent)
         return true
     }
+
+    /* Common snackBar methods */
+    fun snack(message: String, length:Int = Snackbar.LENGTH_LONG) : Snackbar {
+        val rootView = this.window.decorView.findViewById<View>(android.R.id.content)
+        val bar = Snackbar.make(rootView, message, length)
+        bar.show()
+        return bar
+
+    }
+
+
+
 
 //    open val normalBack = false
 

@@ -6,17 +6,16 @@ import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
+import java.lang.Thread.sleep
 
-/**
- * Created by David on 10/11/2017.
- */
 class SongsDatabaseListener() : DownloadCompleteListener {
 
-    var context: SongleContext? = null
+    private var context: SongleContext? = null
+    private var callback: (()-> Unit)? = null
 
-
-    constructor(context: SongleContext) : this() {
+    constructor(context: SongleContext, callback: (()-> Unit)? = null) : this() {
         this.context = context
+        this.callback = callback
     }
 
 
@@ -34,7 +33,11 @@ class SongsDatabaseListener() : DownloadCompleteListener {
          *   TODO do this properly in the parser
          */
         context!!.songs.addAll(songs)
-        context!!.ready = true
+
+
+        
+        /* Invoke callback, if specified*/
+        callback?.invoke()
     }
 
     private fun loadSongs(): List<Song> {
