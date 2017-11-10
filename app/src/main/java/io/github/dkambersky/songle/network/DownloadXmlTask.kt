@@ -1,35 +1,40 @@
-package io.github.dkambersky.songle.services
+package io.github.dkambersky.songle.network
 
-import android.content.res.Resources
 import android.os.AsyncTask
+import org.xml.sax.XMLReader
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
+import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.URL
 
 /**
  * Created by David on 09/11/2017.
  */
-class DownloadXmlTask(private val resources: Resources,
-                      private val caller: DownloadCompleteListener,
-                      private val summaryPref: Boolean) :
+class DownloadXmlTask(private val caller: DownloadCompleteListener) :
         AsyncTask<String, Void, String>() {
-    override fun doInBackground(vararg urls: String): String {
-        return try {
-            loadXmlFromNetwork(urls[0])
+    override fun doInBackground(vararg urls: String): String?{
+        try {
+            return loadXmlFromNetwork(urls[0])
         } catch (e: IOException) {
-            "Unable to load content. Check your network connection"
+            System.err.println("Unable to load content. Check your network connection")
         } catch (e: XmlPullParserException) {
-            "Error parsing XML"
+            System.err.println("Error parsing XML")
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            System.err.println("No download strings specified.")
         }
+        return null
     }
 
+    /* Loads the XML into a String representation */
     private fun loadXmlFromNetwork(urlString: String): String {
-        val result = StringBuilder()
-        val stream = downloadUrl(urlString)
-    // Do something with stream e.g. parse as XML, build result
-        return result.toString()
+        val sb =StringBuilder()
+        val reader = downloadUrl(urlString).reader()
+
+        reader.forEachLine { sb.append(it) }
+
+        return sb.toString()
     }
 
     // Given a string representation of a URL, sets up a connection and gets

@@ -7,10 +7,14 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
 import io.github.dkambersky.songle.R
+import io.github.dkambersky.songle.network.SongsDatabaseListener
+import io.github.dkambersky.songle.network.DownloadXmlTask
+import io.github.dkambersky.songle.storage.SongleContext
 import kotlinx.android.synthetic.main.activity_main_screen.*
 
 class MainScreenActivity : BaseActivity() {
     private var receiver = NetworkReceiver()
+    private var context: SongleContext? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,19 +23,27 @@ class MainScreenActivity : BaseActivity() {
 
         /* Register network receiver */
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(receiver,filter)
+//        println("Registering receiver!")
+//        registerReceiver(receiver,filter)
+
+        /* Initialize context */
+        context = SongleContext(mutableListOf(), mutableListOf(),applicationContext)
 
         /* Register listeners */
         b_newGame.setOnTouchListener({ _, _ -> transition(PreGameActivity::class.java) })
         b_settings.setOnTouchListener({ _, _ -> transition(SettingsActivity::class.java) })
         b_about.setOnTouchListener({ _, _ -> transition(AboutActivity::class.java) })
+        b_leaderboard.setOnTouchListener({ _, _ -> println("ready is ${context!!.ready}");true })
 
-        /* Check for updates */
-        updateCheck()
+
+        /* Check for updates, populate maps */
+        updateAndLoad()
     }
 
-    private fun updateCheck() {
+    private fun updateAndLoad() {
 
+        DownloadXmlTask(SongsDatabaseListener(context!!))
+                .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
 
     }
 
@@ -44,14 +56,21 @@ class MainScreenActivity : BaseActivity() {
                             as ConnectivityManager
             val networkInfo = connMgr.activeNetworkInfo
             if (/*networkPref == wifi && */
-                    networkInfo?.type == ConnectivityManager.TYPE_WIFI) {
-            // Wi-Fi is connected, so use Wi-Fi
+            networkInfo?.type == ConnectivityManager.TYPE_WIFI) {
+                // Wi-Fi is connected, so use Wi-Fi
             } else if (/*networkPref == any && */networkInfo != null) {
-            // Have a network connection and permission, so use data
+                // Have a network connection and permission, so use data
             } else {
-            // No Wi-Fi and no permission, or no network connection
+                // No Wi-Fi and no permission, or no network connection
             }
         }
 
+    }
+
+
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(receiver)
     }
 }

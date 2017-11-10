@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.services
+package io.github.dkambersky.songle.network
 
 import android.app.IntentService
 import android.content.Intent

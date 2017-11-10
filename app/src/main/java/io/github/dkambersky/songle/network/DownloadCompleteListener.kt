@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.services
+package io.github.dkambersky.songle.network
 
 /**
  * Created by David on 09/11/2017.

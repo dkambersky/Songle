@@ -76,7 +76,7 @@
             android:label="@string/title_activity_game_summary"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <service android:name=".services.BackgroundService" />
+        <service android:name=".network.BackgroundService" />
     </application>
 
 </manifest>
