@@ -1,10 +1,5 @@
 package io.github.dkambersky.songle.activities
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
@@ -22,7 +17,7 @@ class MainScreenActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_screen)
 
-        
+
         /* Initialize context */
         context = SongleContext(mutableListOf(), mutableListOf(), applicationContext)
 

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+
     tools:context="io.github.dkambersky.songle.activities.MainScreenActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -16,6 +16,7 @@
         android:id="@+id/MainLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:fitsSystemWindows="true">
 
         <TextView
@@ -27,8 +28,9 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-smallcaps"
-            android:text="Songle"
+            android:text="@string/app_nameStylized"
             android:textAlignment="center"
+
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
@@ -40,7 +42,7 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="249dp"
-            android:layout_height="195dp"
+            android:layout_height="200dp"
             android:layout_marginBottom="88dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
@@ -58,6 +60,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/s_m_new_game"
                 android:textAlignment="center"
+
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/b_leaderboard"
@@ -72,8 +75,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@string/s_m_leaderboard"
+                android:text="@string/s_m_progress"
                 android:textAlignment="center"
+
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/b_settings"
@@ -90,6 +94,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/s_m_open_settings"
                 android:textAlignment="center"
+
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/b_about"
@@ -107,6 +112,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/s_m_about"
                 android:textAlignment="center"
+
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -44,7 +44,7 @@ class BaseActivity : AppCompatActivity() {
     /* Activity Transitions */
     fun <T> transition(activity: Class<T>): Boolean where T : Activity {
         val intent = Intent(this, activity)
-
+        // TODO fix ugly double clicks
         startActivity(intent)
         return true
     }

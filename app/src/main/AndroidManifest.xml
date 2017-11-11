@@ -51,7 +51,7 @@
             android:name=".activities.PreGameActivity"
             android:label="@string/title_activity_pre_game"
             android:parentActivityName=".activities.MainScreenActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.github.dkambersky.songle.activities.MainScreenActivity" />
