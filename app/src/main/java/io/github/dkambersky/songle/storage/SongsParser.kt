@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.content.Context
 import java.io.FileInputStream
+import java.text.ParseException
 
 /**
  * Parses the Songs database.
@@ -79,27 +80,31 @@ class SongsParser() {
 
         /* Check timestamps */
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-        val stampUpdated = parser.getAttributeValue(null, "timestamp")
-        val timeUpdated = format.parse(stampUpdated)
-        val stampLastUpdated = prefs.getString("last-updated", "")
+        try {
+            val stampUpdated = parser.getAttributeValue(null, "timestamp")
+            val timeUpdated = format.parse(stampUpdated)
+            val stampLastUpdated = prefs.getString("last-updated", "")
 
-        /* Detect & handle first launch */
-        if(stampLastUpdated == ""){
-            val editor = prefs.edit()
-            editor.putString("last-updated", stampUpdated)
-            editor.apply()
+            /* Detect & handle first launch */
+            if (stampLastUpdated == "") {
+                val editor = prefs.edit()
+                editor.putString("last-updated", stampUpdated)
+                editor.apply()
+                return true
+            }
+
+            /* Detect & handle newer version of database */
+            val needUpdate = format.parse(stampLastUpdated).before(timeUpdated)
+            if (needUpdate) {
+                val editor = prefs.edit()
+                editor.putString("last-updated", stampUpdated)
+                editor.apply()
+                return true
+            }
+        } catch (e: ParseException){
+            /* Parsing failed, update just in case */
             return true
         }
-
-        /* Detect & handle newer version of database */
-        val needUpdate = format.parse(stampLastUpdated).before(timeUpdated)
-        if(needUpdate){
-            val editor = prefs.edit()
-            editor.putString("last-updated", stampUpdated)
-            editor.apply()
-            return true
-        }
-
         return false
     }
 

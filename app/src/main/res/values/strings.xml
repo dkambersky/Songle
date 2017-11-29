@@ -15,18 +15,22 @@
     <string name="s_m_about">About</string>
 
     <!-- About -->
-    <string name="about_MainContent"><b>Hi!</b>\n This is an about page.</string>
+    <string name="about_MainContent">
+        <b>Hi!</b>
+        \n This is an About page.\n\n
+        <b>How to play:</b>\n
+        Walk around collecting words. When you have enough, try guessing the song they\'re from!\n\n\n
+        <b>Changelog:</b>\n
+        -----\n\n
+        <b>Contact:</b>\n
+            WIP\n\n
+        <b>Attributions:</b>\n
+            WIP\n
+    </string>
 
 
     <!-- Pre-Game -->
     <string name="pregame_title">New Game</string>
-
-
-
-
-
-
-
 
 
     <!-- Strings related to Settings -->
