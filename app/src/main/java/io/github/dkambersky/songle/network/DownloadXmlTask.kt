@@ -1,7 +1,7 @@
 package io.github.dkambersky.songle.network
 
 import android.os.AsyncTask
-import org.xml.sax.XMLReader
+import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream

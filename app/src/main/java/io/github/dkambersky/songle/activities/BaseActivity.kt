@@ -58,15 +58,4 @@ class BaseActivity : AppCompatActivity() {
 
     }
 
-
-
-
-//    open val normalBack = false
-
-    /* Fix back button transitions */
-//    override fun onBackPressed() {
-//        if (normalBack) {super.onBackPressed(); return}
-//        if (parent == null) transition(MainScreenActivity::class.java) else
-//            transition(parent::class.java)
-//    }
 }

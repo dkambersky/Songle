@@ -15,14 +15,7 @@ import java.text.ParseException
 /**
  * Parses the Songs database.
  */
-class SongsParser() {
-    var context: Context? = null
-
-    constructor(context: Context) : this() {
-        this.context = context
-    }
-
-    private val ns: String? = null
+class SongsParser(context: SongleContext) : BaseParser(context) {
     private var root: String? = null
 
     @Throws(XmlPullParserException::class, IOException::class)
@@ -70,13 +63,13 @@ class SongsParser() {
      * Ensures we're reading a Songs file,
      * parses the timestamp and root.
      *
-     * @return *true* if the database needs and update; false otherwise
+     * @return *true* if the database needs an update; false otherwise
      */
     @SuppressLint("SimpleDateFormat")
     private fun parseMetadata(parser: XmlPullParser): Boolean {
         parser.require(XmlPullParser.START_TAG, ns, "Songs")
         root = parser.getAttributeValue(null, "root")
-        val prefs = context!!.getSharedPreferences("base", 0)!!
+        val prefs = context.context.getSharedPreferences("base", 0)!!
 
         /* Check timestamps */
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -131,35 +124,7 @@ class SongsParser() {
     }
 
 
-    @Throws(IOException::class, XmlPullParserException::class)
-    private fun readByTag(parser: XmlPullParser, tag: String): String {
-        parser.require(XmlPullParser.START_TAG, ns, tag)
-        val out = readText(parser)
-        parser.require(XmlPullParser.END_TAG, ns, tag)
-        return out
-    }
 
-    @Throws(IOException::class, XmlPullParserException::class)
-    private fun readText(parser: XmlPullParser): String {
-        var result = ""
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.text
-            parser.nextTag()
-        }
-        return result
-    }
 
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun skip(parser: XmlPullParser) {
-        if (parser.eventType != XmlPullParser.START_TAG) {
-            throw IllegalStateException()
-        }
-        var depth = 1
-        while (depth != 0) {
-            when (parser.next()) {
-                XmlPullParser.END_TAG -> depth--
-                XmlPullParser.START_TAG -> depth++
-            }
-        }
-    }
+
 }

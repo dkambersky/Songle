@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.network
+package io.github.dkambersky.songle.network.listeners
 
 import io.github.dkambersky.songle.storage.Song
 import io.github.dkambersky.songle.storage.SongleContext
@@ -6,14 +6,14 @@ import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
-import java.lang.Thread.sleep
 
+/** Listens for and handles the download of the songs database */
 class SongsDatabaseListener() : DownloadCompleteListener {
 
-    private var context: SongleContext? = null
-    private var callback: (()-> Unit)? = null
+    private lateinit var context: SongleContext
+    private lateinit var callback: () -> Unit
 
-    constructor(context: SongleContext, callback: (()-> Unit)? = null) : this() {
+    constructor(context: SongleContext, callback: (() -> Unit)) : this() {
         this.context = context
         this.callback = callback
     }
@@ -21,28 +21,27 @@ class SongsDatabaseListener() : DownloadCompleteListener {
 
     override fun downloadComplete(result: String) {
         /* Save the current db into a file */
-        val outFile = File(context!!.context.filesDir, "songs.xml")
+        val outFile = File(context.context.filesDir, "songs.xml")
         val outWriter = FileWriter(outFile)
         outWriter.write(result)
         outWriter.flush()
         outWriter.close()
 
-        val songs = SongsParser(context!!.context).parse(result.byteInputStream()) ?: loadSongs()
+        val songs = SongsParser(context).parse(result.byteInputStream()) ?: loadSongs()
 
         /* Load into the application
          *   TODO do this properly in the parser
          */
-        context!!.songs.addAll(songs)
+        context.songs.addAll(songs)
 
 
-        
         /* Invoke callback, if specified*/
-        callback?.invoke()
+        callback.invoke()
     }
 
     private fun loadSongs(): List<Song> {
-        return SongsParser(context!!.context)
-                .parse(FileInputStream(File(context!!.context.filesDir, "songs.xml")))!!
+        return SongsParser(context)
+                .parse(FileInputStream(File(context.context.filesDir, "songs.xml")))!!
     }
 
 }
