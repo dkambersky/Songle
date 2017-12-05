@@ -45,17 +45,16 @@ class MainScreenActivity : BaseActivity() {
     private fun snackShowFinished(snackbarUpdating: Snackbar) {
         snackbarUpdating.dismiss()
         println(context.songs[0])
-        println("Starting songmap dl task")
+
         DownloadXmlTask(SongMapListener(context, { play() }, 1))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map5.kml")
 
-        print("After starting task")
+
         b_newGame.isEnabled = true
     }
 
     private fun play() {
-        println("Printing shit!")
-        println(context.maps[0])
+        println(context.maps[1])
     }
 
 

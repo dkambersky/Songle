@@ -38,7 +38,6 @@ class MapParser(context: SongleContext) : BaseParser(context) {
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
             }
-            println("Now parsing a thingy with name ${parser.name}")
             when (parser.name) {
                 "Style" -> {
                     val style = readStyle(parser)
@@ -60,20 +59,13 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         /* Ensure we're reading a Style */
         require(parser, "Style")
 
-
+        /* Read info */
         val id = parser.getAttributeValue(ns, "id")
-
-        parser.next()
-        parser.next()
+        step(parser)
         require(parser, "IconStyle", true)
-
         val scale = readByTag(parser, "scale").toFloat()
-
-        step(parser)
-        step(parser)
-
+        step(parser, 2)
         val icon = readByTag(parser, "href")
-
 
         /* Get rid of end tags*/
         while (parser.eventType == END_TAG || (parser.eventType == TEXT && parser.isWhitespace)) {
@@ -82,16 +74,6 @@ class MapParser(context: SongleContext) : BaseParser(context) {
 
         /* Return */
         return Style(id, scale, icon)
-
-    }
-
-    /* Steps one tag further and skips any potential whitespace */
-    private fun step(parser: XmlPullParser, no: Int = 1) {
-        for (i in 1..no) {
-            while (parser.next() == TEXT && parser.isWhitespace) {
-
-            }
-        }
 
     }
 
@@ -108,18 +90,24 @@ class MapParser(context: SongleContext) : BaseParser(context) {
             when (parser.name) {
                 "name" -> name = readByTag(parser, "name")
                 "description" -> description = readByTag(parser, "description")
-                "styleUrl" -> style = context.styles[readByTag(parser, "styleUrl")] ?: Style()
-                "point" -> point = readPoint(parser)
+                "styleUrl" -> style = context.styles[readByTag(parser, "styleUrl").substring(1)] ?: Style()
+                "Point" -> point = readPoint(parser)
                 else -> skip(parser)
             }
         }
-        println("Built a placemark  ")
         return Placemark(name, description, style, point)
     }
 
     private fun readPoint(parser: XmlPullParser): Point2D {
-        skip(parser)
-        return Point2D(1f, 1f)
+        /* Step over <Point> */
+        step(parser)
+
+        val (x, y) = readByTag(parser, "coordinates").split(",")
+
+        /* Step over </Point> */
+        step(parser)
+
+        return Point2D(x.toFloat(), y.toFloat())
     }
 
 

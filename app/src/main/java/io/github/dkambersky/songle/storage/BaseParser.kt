@@ -46,11 +46,29 @@ open class BaseParser(val context: SongleContext) {
         return out
     }
 
-    /* Utility function to reduce some of the boilerplate */
+    /**
+     * Require a specific start tag - less boilerplate
+     */
     protected fun require(parser: XmlPullParser, tag: String, skip: Boolean = false) {
         parser.require(XmlPullParser.START_TAG, ns, tag)
         if (skip) parser.nextTag()
     }
+
+    /** Steps [no] of tags forward and skips any potential whitespace
+     * @param parser parser to use
+     * @param no Number of tags to go forward; defaults to 1
+     */
+    protected fun step(parser: XmlPullParser, no: Int = 1) {
+
+        /* The missing blocks are generally not a good idea,
+         *   but this function is complete and it looks cleaner
+         *   than two effectively empty blocks.
+         */
+        for (i in 1..no)
+            while (parser.next() == XmlPullParser.TEXT && parser.isWhitespace);
+
+    }
+
 
 
 }
