@@ -1,13 +1,13 @@
-package io.github.dkambersky.songle.network
+package io.github.dkambersky.songle.network.listeners
 
 import io.github.dkambersky.songle.data.Song
 import io.github.dkambersky.songle.data.SongleContext
-import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
 import io.github.dkambersky.songle.storage.MapParser
 import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
+
 
 /** Listens for and handles the download of the songs database */
 class SongMapListener(var context: SongleContext,
@@ -25,6 +25,7 @@ class SongMapListener(var context: SongleContext,
         outWriter.flush()
         outWriter.close()
 
+
         val map = MapParser(context).parse(result.byteInputStream())
 
         /* Load into the application
@@ -33,8 +34,12 @@ class SongMapListener(var context: SongleContext,
         context.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
 
 
+
+        println("SongMap thing ended!! wryy")
         /* Invoke callback, if specified*/
         callback.invoke()
+
+
     }
 
     private fun loadSongs(): List<Song> {

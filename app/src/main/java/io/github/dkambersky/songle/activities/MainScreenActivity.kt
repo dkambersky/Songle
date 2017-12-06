@@ -1,14 +1,13 @@
 package io.github.dkambersky.songle.activities
 
+
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.SongleContext
 import io.github.dkambersky.songle.network.DownloadXmlTask
-import io.github.dkambersky.songle.network.SongMapListener
+import io.github.dkambersky.songle.network.listeners.SongMapListener
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
-
-
 import kotlinx.android.synthetic.main.activity_main_screen.*
 
 
@@ -39,22 +38,19 @@ class MainScreenActivity : BaseActivity() {
         DownloadXmlTask(SongsDatabaseListener(songle.context, { snackShowFinished(snackbarUpdating) }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
 
+
     }
 
+    private fun updateStep() {
+        DownloadXmlTask(SongMapListener(songle.context, { updateStep() }, 1, 1))
+                .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map5.kml")
+    }
 
     private fun snackShowFinished(snackbarUpdating: Snackbar) {
         snackbarUpdating.dismiss()
-        println(songle.context.songs[0])
 
-        DownloadXmlTask(SongMapListener(songle.context, { play() }, 1, 1))
-                .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map5.kml")
-
-
+        updateStep()
         b_newGame.isEnabled = true
-    }
-
-    private fun play() {
-        println(songle.context.maps[1])
     }
 
 
