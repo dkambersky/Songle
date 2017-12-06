@@ -9,6 +9,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.dkambersky.songle.R
+import io.github.dkambersky.songle.data.Difficulty
+import io.github.dkambersky.songle.data.Song
 
 class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
@@ -18,11 +20,26 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_in_game)
+
+
+        /* Generate the game map */
+        generateMap(
+                intent.extras["Difficulty"] as Difficulty,
+                intent.extras["Song"] as Song)
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
     }
+
+
+    private fun generateMap(difficulty: Difficulty, song: Song) {
+        println("Song $song, Difficulty $difficulty")
+
+    }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -30,10 +47,10 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
         /* Load dark mode */
         googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
-                        this,R.raw.style_json))
+                        this, R.raw.style_json))
 
         /* Default to Crichton St */
-        val crichton = LatLng(55.944575,  -3.187129)
+        val crichton = LatLng(55.944575, -3.187129)
         mMap.addMarker(MarkerOptions().position(crichton).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(crichton))
 
@@ -43,7 +60,7 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
         } catch (se: SecurityException) {
             println("Security exception thrown [onMapReady]")
         }
-            // Add ”My location” button to the user interface
+        // Add ”My location” button to the user interface
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
 

@@ -5,7 +5,6 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/secondaryColor</item>
-        <!--<item name="colorBackgroundx">@color/blackOverlay</item>-->
         <item name="android:windowBackground">@color/primaryDarkColor</item>
         <item name="android:colorForeground">@color/secondaryLightColor</item>
         <item name="android:navigationBarColor">@color/secondaryColor</item>
@@ -15,17 +14,18 @@
         <item name="android:colorAccent">@color/secondaryColor</item>
         <item name="android:textColorPrimaryInverse">@android:color/white</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColor</item>
-        <item name="android:buttonStyle">@style/Widget.AppCompat.Button</item>
+        <item name="android:buttonStyle">@style/buttonStyle</item>
         <item name="colorButtonNormal">@color/secondaryLightColor</item>
         <item name="android:textColorPrimary">@android:color/background_dark</item>
     </style>
 
 
+    <style name="buttonStyle" parent="@style/Widget.AppCompat.Button">
+        <item name="android:textStyle">bold</item>
+    </style>
 
 
-
-
-<style name="FullscreenTheme" parent="AppTheme">
+    <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>

@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.storage
+package io.github.dkambersky.songle.data
 
 import android.content.Context
 import java.io.Serializable
@@ -32,4 +32,5 @@ data class SongleContext(val songs: MutableList<Song>,
                          val maps: MutableMap<Short, List<Placemark>>,
                          val styles: MutableMap<String, Style>,
                          @Transient val context: Context,
+                         var clearedSongs: MutableSet<Song>,
                          var root: String) : Serializable

@@ -6,7 +6,7 @@ import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.network.DownloadXmlTask
 import io.github.dkambersky.songle.network.SongMapListener
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
-import io.github.dkambersky.songle.storage.SongleContext
+import io.github.dkambersky.songle.data.SongleContext
 import kotlinx.android.synthetic.main.activity_main_screen.*
 
 
@@ -18,7 +18,7 @@ class MainScreenActivity : BaseActivity() {
         setContentView(R.layout.activity_main_screen)
 
         /* Initialize context */
-        songle.context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext, "")
+        songle.context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext, mutableSetOf(), "")
 
         /* Register listeners, set up UI */
         b_newGame.setOnClickListener({ transition(PreGameActivity::class.java) })
@@ -36,6 +36,7 @@ class MainScreenActivity : BaseActivity() {
 
         DownloadXmlTask(SongsDatabaseListener(songle.context, { snackShowFinished(snackbarUpdating) }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+
 
     }
 
