@@ -67,7 +67,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         step(parser, 2)
         val icon = readByTag(parser, "href")
 
-        /* Get rid of end tags*/
+        /* Get rid of end tags */
         while (parser.eventType == END_TAG || (parser.eventType == TEXT && parser.isWhitespace)) {
             if (parser.name != "Style") parser.next() else break
         }

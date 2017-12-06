@@ -30,4 +30,5 @@ data class Song(val num: Short, val artist: String, val title: String, val link:
 data class SongleContext(val songs: MutableList<Song>,
                          val maps: MutableMap<Short, List<Placemark>>,
                          val styles: MutableMap<String, Style>,
-                         val context: Context)
+                         val context: Context,
+                         var root: String)

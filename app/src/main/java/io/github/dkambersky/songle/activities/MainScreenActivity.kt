@@ -20,12 +20,12 @@ class MainScreenActivity : BaseActivity() {
 
 
         /* Initialize context */
-        context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext)
+        context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext, "")
 
         /* Register listeners, set up UI */
-        b_newGame.setOnTouchListener({ _, _ -> transition(PreGameActivity::class.java) })
-        b_settings.setOnTouchListener({ _, _ -> transition(SettingsActivity::class.java) })
-        b_about.setOnTouchListener({ _, _ -> transition(AboutActivity::class.java) })
+        b_newGame.setOnClickListener({ transition(PreGameActivity::class.java) })
+        b_settings.setOnClickListener({ transition(SettingsActivity::class.java) })
+        b_about.setOnClickListener({ transition(AboutActivity::class.java) })
 
         b_newGame.isEnabled = false
 
@@ -38,7 +38,6 @@ class MainScreenActivity : BaseActivity() {
 
         DownloadXmlTask(SongsDatabaseListener(context, { snackShowFinished(snackbarUpdating) }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
-
 
     }
 

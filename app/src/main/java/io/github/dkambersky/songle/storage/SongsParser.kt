@@ -4,19 +4,17 @@ import android.annotation.SuppressLint
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
+import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import android.content.Context
-import java.io.FileInputStream
-import java.text.ParseException
 
 /**
  * Parses the Songs database.
  */
 class SongsParser(context: SongleContext) : BaseParser(context) {
-    private var root: String? = null
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(input: InputStream): List<Song>? {
@@ -68,7 +66,7 @@ class SongsParser(context: SongleContext) : BaseParser(context) {
     @SuppressLint("SimpleDateFormat")
     private fun parseMetadata(parser: XmlPullParser): Boolean {
         parser.require(XmlPullParser.START_TAG, ns, "Songs")
-        root = parser.getAttributeValue(null, "root")
+        context.root = parser.getAttributeValue(null, "root")
         val prefs = context.context.getSharedPreferences("base", 0)!!
 
         /* Check timestamps */

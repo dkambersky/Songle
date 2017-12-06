@@ -21,7 +21,6 @@ abstract
  */
 class BaseActivity : AppCompatActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,13 +43,12 @@ class BaseActivity : AppCompatActivity() {
     /* Activity Transitions */
     fun <T> transition(activity: Class<T>): Boolean where T : Activity {
         val intent = Intent(this, activity)
-        // TODO fix ugly double clicks
         startActivity(intent)
         return true
     }
 
     /* Common snackBar methods */
-    fun snack(message: String, length:Int = Snackbar.LENGTH_LONG) : Snackbar {
+    fun snack(message: String, length: Int = Snackbar.LENGTH_LONG): Snackbar {
         val rootView = this.window.decorView.findViewById<View>(android.R.id.content)
         val bar = Snackbar.make(rootView, message, length)
         bar.show()
