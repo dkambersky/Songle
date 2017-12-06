@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import java.io.Serializable
 
 @SuppressLint("Registered")
 abstract
@@ -41,8 +44,14 @@ class BaseActivity : AppCompatActivity() {
     }
 
     /* Activity Transitions */
-    fun <T> transition(activity: Class<T>): Boolean where T : Activity {
+    fun <T> transition(activity: Class<T>, vararg data: Pair<String, Serializable>): Boolean where T : Activity {
         val intent = Intent(this, activity)
+
+        for (pair in data) {
+            intent.putExtra(pair.first, pair.second)
+        }
+
+
         startActivity(intent)
         return true
     }

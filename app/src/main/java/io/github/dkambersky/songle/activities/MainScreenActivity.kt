@@ -7,12 +7,15 @@ import io.github.dkambersky.songle.network.DownloadXmlTask
 import io.github.dkambersky.songle.network.SongMapListener
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
 import io.github.dkambersky.songle.storage.SongleContext
+
 import kotlinx.android.synthetic.main.activity_main_screen.*
 
 
 class MainScreenActivity : BaseActivity() {
 
     private lateinit var context: SongleContext
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +26,7 @@ class MainScreenActivity : BaseActivity() {
         context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext, "")
 
         /* Register listeners, set up UI */
-        b_newGame.setOnClickListener({ transition(PreGameActivity::class.java) })
+        b_newGame.setOnClickListener({ transition(PreGameActivity::class.java, Pair("context", context)) })
         b_settings.setOnClickListener({ transition(SettingsActivity::class.java) })
         b_about.setOnClickListener({ transition(AboutActivity::class.java) })
 
@@ -55,6 +58,7 @@ class MainScreenActivity : BaseActivity() {
     private fun play() {
         println(context.maps[1])
     }
+
 
 
 }
