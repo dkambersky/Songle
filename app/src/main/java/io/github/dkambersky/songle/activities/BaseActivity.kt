@@ -1,20 +1,17 @@
 package io.github.dkambersky.songle.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import io.github.dkambersky.songle.SongleApplication
 import java.io.Serializable
 
-@SuppressLint("Registered")
-abstract
+
 /**
  * Base Activity class.
  * Implements shared functionality like UI tweaks
@@ -22,10 +19,14 @@ abstract
  *  in every activity separately.
  *
  */
-class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
+    lateinit var songle: SongleApplication
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /* Get application */
+        songle = application as SongleApplication
 
         /* Enter / keep fullscreen */
         enterFullscreen()
