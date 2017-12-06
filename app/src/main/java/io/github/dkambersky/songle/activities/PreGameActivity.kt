@@ -2,6 +2,7 @@ package io.github.dkambersky.songle.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.text.Html
 import android.widget.Button
 import io.github.dkambersky.songle.R
@@ -13,7 +14,7 @@ import java.util.*
 class PreGameActivity : BaseActivity() {
 
     private lateinit var diffButtons: List<Button>
-    private var difficulty = Difficulty.MEDIUM
+    private var difficulty: Difficulty? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,15 +34,20 @@ class PreGameActivity : BaseActivity() {
 
         diffButtons = listOf(b_easy, b_med, b_hard)
 
-        b_startGame.setOnClickListener {
+        b_startGame.setOnClickListener { enterGame() }
+
+
+    }
+
+    private fun enterGame() {
+        if (difficulty != null) {
             transition(
                     InGameActivity::class.java,
-                    Pair("Difficulty", difficulty),
-                    Pair("Song", getSong())
-            )
+                    Pair("Difficulty", difficulty!!),
+                    Pair("Song", getSong()))
+        } else {
+            snack("Please select a difficulty", Snackbar.LENGTH_SHORT)
         }
-
-
     }
 
 

@@ -60,13 +60,14 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="298dp"
         android:layout_height="42dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:progress="65"
         android:progressTint="@color/primaryLightColor"
         android:tooltipText="Map upgrade progress"
         app:layout_constraintBottom_toTopOf="@+id/map"
-        app:layout_constraintEnd_toStartOf="@+id/map"
-        app:layout_constraintHorizontal_bias="0.546"
-        app:layout_constraintStart_toEndOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map"
         app:layout_constraintVertical_bias="0.84" />
 
@@ -75,11 +76,12 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="298dp"
         android:layout_height="42dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:progress="40"
         app:layout_constraintBottom_toTopOf="@+id/map"
-        app:layout_constraintEnd_toStartOf="@+id/map"
-        app:layout_constraintHorizontal_bias="0.548"
-        app:layout_constraintStart_toEndOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map"
         app:layout_constraintVertical_bias="0.927" />
 

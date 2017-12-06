@@ -1,8 +1,8 @@
 package io.github.dkambersky.songle.storage
 
 import android.util.Xml
+import com.google.android.gms.maps.model.LatLng
 import io.github.dkambersky.songle.data.Placemark
-import io.github.dkambersky.songle.data.Point2D
 import io.github.dkambersky.songle.data.SongleContext
 import io.github.dkambersky.songle.data.Style
 import org.xmlpull.v1.XmlPullParser
@@ -87,7 +87,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         var name = ""
         var description = ""
         var style = Style()
-        var point = Point2D(0f, 0f)
+        var point = LatLng(0.0, 0.0)
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG)
                 continue
@@ -102,7 +102,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         return Placemark(name, description, style, point)
     }
 
-    private fun readPoint(parser: XmlPullParser): Point2D {
+    private fun readPoint(parser: XmlPullParser): LatLng {
         /* Step over <Point> */
         step(parser)
 
@@ -111,7 +111,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         /* Step over </Point> */
         step(parser)
 
-        return Point2D(x.toFloat(), y.toFloat())
+        return LatLng(x.toDouble(), y.toDouble())
     }
 
 

@@ -3,15 +3,16 @@ package io.github.dkambersky.songle.activities
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
+import io.github.dkambersky.songle.data.SongleContext
 import io.github.dkambersky.songle.network.DownloadXmlTask
 import io.github.dkambersky.songle.network.SongMapListener
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
-import io.github.dkambersky.songle.data.SongleContext
+
+
 import kotlinx.android.synthetic.main.activity_main_screen.*
 
 
 class MainScreenActivity : BaseActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,17 +35,18 @@ class MainScreenActivity : BaseActivity() {
     private fun updateAndLoad() {
         val snackbarUpdating = snack("Hang tight! Checking for updates.", Snackbar.LENGTH_INDEFINITE)
 
+
         DownloadXmlTask(SongsDatabaseListener(songle.context, { snackShowFinished(snackbarUpdating) }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
 
-
     }
+
 
     private fun snackShowFinished(snackbarUpdating: Snackbar) {
         snackbarUpdating.dismiss()
         println(songle.context.songs[0])
 
-        DownloadXmlTask(SongMapListener(songle.context, { play() }, 1))
+        DownloadXmlTask(SongMapListener(songle.context, { play() }, 1, 1))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map5.kml")
 
 

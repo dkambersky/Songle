@@ -22,11 +22,6 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_in_game)
 
 
-        /* Generate the game map */
-        generateMap(
-                intent.extras["Difficulty"] as Difficulty,
-                intent.extras["Song"] as Song)
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -35,8 +30,15 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
     }
 
 
-    private fun generateMap(difficulty: Difficulty, song: Song) {
+    private fun generateMap(difficulty: Difficulty, song: Song, map: GoogleMap) {
         println("Song $song, Difficulty $difficulty")
+
+        val gameMap = songle.context.maps[song.num]?.get(difficulty.startMapMode.toShort())!!
+
+
+        for (point in gameMap) {
+            map.addMarker(MarkerOptions().position(point.loc))
+        }
 
     }
 
@@ -62,6 +64,13 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
         }
         // Add ”My location” button to the user interface
         mMap.uiSettings.isMyLocationButtonEnabled = true
+
+
+        /* Generate the game map */
+        generateMap(
+                intent.extras["Difficulty"] as Difficulty,
+                intent.extras["Song"] as Song,
+                mMap)
 
 
     }

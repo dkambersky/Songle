@@ -1,12 +1,13 @@
 package io.github.dkambersky.songle.data
 
 import android.content.Context
+import com.google.android.gms.maps.model.LatLng
 import java.io.Serializable
 
 /**
  * Defines a single Placemark on the map
  */
-data class Placemark(val name: String, val description: String, val style: Style, val loc: Point2D) : Serializable
+data class Placemark(val name: String, val description: String, val style: Style, val loc: LatLng) : Serializable
 
 /**
  * Defines coordinates in the map
@@ -29,7 +30,7 @@ data class Song(val num: Short, val artist: String, val title: String, val link:
  * Carries application data for easy passing around
  */
 data class SongleContext(val songs: MutableList<Song>,
-                         val maps: MutableMap<Short, List<Placemark>>,
+                         val maps: MutableMap<Short, MutableMap<Short, List<Placemark>>>,
                          val styles: MutableMap<String, Style>,
                          @Transient val context: Context,
                          var clearedSongs: MutableSet<Song>,

@@ -1,9 +1,9 @@
 package io.github.dkambersky.songle.network
 
-import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
-import io.github.dkambersky.songle.storage.MapParser
 import io.github.dkambersky.songle.data.Song
 import io.github.dkambersky.songle.data.SongleContext
+import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
+import io.github.dkambersky.songle.storage.MapParser
 import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
 import java.io.FileInputStream
@@ -11,8 +11,7 @@ import java.io.FileWriter
 
 /** Listens for and handles the download of the songs database */
 class SongMapListener(var context: SongleContext,
-                      private var callback: () -> Unit, private var id: Short = -1) : DownloadCompleteListener {
-
+                      private var callback: () -> Unit, private var id: Short = -1, private var level: Short = -1) : DownloadCompleteListener {
 
 
     override fun downloadComplete(result: String) {
@@ -26,12 +25,12 @@ class SongMapListener(var context: SongleContext,
         outWriter.flush()
         outWriter.close()
 
-        val song = MapParser(context).parse(result.byteInputStream())
+        val map = MapParser(context).parse(result.byteInputStream())
 
         /* Load into the application
          *   TODO do this properly in the parser
          */
-        context.maps.put(id, song)
+        context.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
 
 
         /* Invoke callback, if specified*/
