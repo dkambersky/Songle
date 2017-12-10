@@ -19,7 +19,13 @@ class SongsDatabaseListener() : DownloadCompleteListener {
     }
 
 
-    override fun downloadComplete(result: String) {
+    override fun downloadComplete(result: String?) {
+        if (result == null) {
+            System.err.println("Database download failed!")
+            return
+        }
+
+
         /* Save the current db into a file */
         val outFile = File(context.context.filesDir, "songs.xml")
         val outWriter = FileWriter(outFile)

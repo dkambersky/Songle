@@ -2,14 +2,12 @@ package io.github.dkambersky.songle.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.SongleApplication
 import java.io.Serializable
 

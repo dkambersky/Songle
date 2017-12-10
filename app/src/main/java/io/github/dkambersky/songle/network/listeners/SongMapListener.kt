@@ -1,8 +1,7 @@
-package io.github.dkambersky.songle.network
+package io.github.dkambersky.songle.network.listeners
 
 import io.github.dkambersky.songle.data.Song
 import io.github.dkambersky.songle.data.SongleContext
-import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
 import io.github.dkambersky.songle.storage.MapParser
 import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
@@ -14,9 +13,13 @@ class SongMapListener(var context: SongleContext,
                       private var callback: () -> Unit, private var id: Short = -1, private var level: Short = -1) : DownloadCompleteListener {
 
 
-    override fun downloadComplete(result: String) {
-        /* Sanity check for ID */
+    override fun downloadComplete(result: String?) {
+        /* Sanity checks for ID */
         if (id == (-1).toShort()) return
+        if (result == null) {
+            System.err.println("Map download failed! id $id, level $level")
+            return
+        }
 
         /* Save the downloaded song into a file */
         val outFile = File(context.context.filesDir, "song$id.xml")

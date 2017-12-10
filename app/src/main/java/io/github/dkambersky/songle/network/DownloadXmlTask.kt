@@ -18,7 +18,8 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
         try {
             return loadXmlFromNetwork(urls[0])
         } catch (e: IOException) {
-            System.err.println("Unable to load content. Check your network connection")
+            System.err.println("Unable to load content. Check your network connection\n" +
+                    "Relevant URL: ${urls[0]}")
         } catch (e: XmlPullParserException) {
             System.err.println("Error parsing XML")
         } catch (e: ArrayIndexOutOfBoundsException) {
@@ -53,7 +54,7 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
         return conn.inputStream
     }
 
-    override fun onPostExecute(result: String) {
+    override fun onPostExecute(result: String?) {
         super.onPostExecute(result)
         caller.downloadComplete(result)
     }
