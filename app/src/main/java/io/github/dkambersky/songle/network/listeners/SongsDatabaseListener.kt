@@ -35,9 +35,7 @@ class SongsDatabaseListener() : DownloadCompleteListener {
 
         val songs = SongsParser(context).parse(result.byteInputStream()) ?: loadSongs()
 
-        /* Load into the application
-         *   TODO do this properly in the parser
-         */
+
         context.songs.addAll(songs)
 
 

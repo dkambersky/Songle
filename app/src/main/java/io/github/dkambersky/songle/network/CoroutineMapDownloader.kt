@@ -1,7 +1,7 @@
 package io.github.dkambersky.songle.network
 
-import io.github.dkambersky.songle.storage.MapParser
 import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.storage.MapParser
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import java.io.File
@@ -15,7 +15,7 @@ import java.net.URL
  * Experimental coroutine downloadXml class
  */
 class CoroutineMapDownloader(private var songleContext: SongleContext,
-                             private var id: Short = -1, private var level: Short = -1) {
+                             private var id: Short = -1, private var level: Short = -1, private val file: File) {
     fun fetchMap(vararg urls: String): Deferred<Unit> {
         return async {
             urls.forEach {
@@ -54,8 +54,7 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
         }
 
         /* Save the downloaded song into a file */
-        val outFile = File(songleContext.context.filesDir, "song$id.xml")
-        val outWriter = FileWriter(outFile)
+        val outWriter = FileWriter(file)
         outWriter.write(result)
         outWriter.flush()
         outWriter.close()
