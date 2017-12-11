@@ -5,6 +5,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
@@ -79,10 +80,12 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
     }
 
-
     private fun addMarker(loc: LatLng, title: String, style: Style) {
-
-        mMap.addMarker(MarkerOptions().position(loc).title(title).icon(style.icon))
+        mMap.addMarker(
+                MarkerOptions()
+                        .position(loc)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory.fromBitmap(style.icon)))
     }
 
     private fun addMarker(point: Placemark) {

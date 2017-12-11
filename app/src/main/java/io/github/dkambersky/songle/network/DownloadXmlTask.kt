@@ -2,7 +2,6 @@ package io.github.dkambersky.songle.network
 
 import android.os.AsyncTask
 import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
-import kotlinx.coroutines.experimental.launch
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
@@ -57,7 +56,7 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
 
     override fun onPostExecute(result: String?) {
         super.onPostExecute(result)
-        launch { caller.downloadComplete(result) }
+        caller.downloadComplete(result)
     }
 
 }

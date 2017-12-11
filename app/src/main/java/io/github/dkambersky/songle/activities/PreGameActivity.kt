@@ -70,11 +70,12 @@ class PreGameActivity : BaseActivity() {
     }
 
     private fun getSong(): Song {
+        val presentSongs = songle.context.songs.filter { songle.context.maps.containsKey(it.num) }
         val candidates =
                 if (b_includeSolved.isChecked)
-                    songle.context.songs
+                    presentSongs
                 else
-                    songle.context.songs.filter { !songle.context.clearedSongs.contains(it) }
+                    presentSongs.filter { !songle.context.clearedSongs.contains(it) }
 
         return candidates[Random().nextInt(candidates.size)]
     }

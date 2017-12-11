@@ -2,7 +2,6 @@ package io.github.dkambersky.songle.storage
 
 import android.graphics.BitmapFactory
 import android.util.Xml
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import io.github.dkambersky.songle.data.Placemark
 import io.github.dkambersky.songle.data.SongleContext
@@ -11,7 +10,6 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParser.END_TAG
 import org.xmlpull.v1.XmlPullParser.TEXT
 import org.xmlpull.v1.XmlPullParserException
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
@@ -30,6 +28,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
                     false)
             parser.setInput(input, null)
             parser.nextTag()
+
             return readMap(parser)
         }
     }
@@ -44,12 +43,14 @@ class MapParser(context: SongleContext) : BaseParser(context) {
 
         /* Process entries one by one */
         while (parser.next() != XmlPullParser.END_TAG) {
+
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
             }
             when (parser.name) {
                 "Style" -> {
-                    val style = readStyle(parser)
+                    val style =
+                            readStyle(parser)
                     context.styles.put(style.id, style)
 
                 }
@@ -60,11 +61,13 @@ class MapParser(context: SongleContext) : BaseParser(context) {
             }
         }
 
+
         return entries
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
     private fun readStyle(parser: XmlPullParser): Style {
+        println("Starting to ReadStyle... should get a confirmation below!")
         /* Ensure we're reading a Style */
         require(parser, "Style")
 
@@ -78,18 +81,8 @@ class MapParser(context: SongleContext) : BaseParser(context) {
 
 
         /* Fetch & build style */
-        val inStream = URL(iconUrl).content as InputStream
-        val buffer = ByteArray(8192)
-        var bytesRead: Int = inStream.read(buffer)
-        val output = ByteArrayOutputStream()
-        while (bytesRead != -1) {
-            bytesRead = inStream.read(buffer)
-            output.write(buffer, 0, bytesRead)
-        }
-        val iconBitmap = output.toByteArray()
+        val image = BitmapFactory.decodeStream(URL(iconUrl).content as InputStream)
 
-        val bm = BitmapFactory.decodeByteArray(iconBitmap, 0, iconBitmap.size)
-        val icon = BitmapDescriptorFactory.fromBitmap(bm)
 
         /* Get rid of end tags */
         while (parser.eventType == END_TAG || (parser.eventType == TEXT && parser.isWhitespace)) {
@@ -97,9 +90,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         }
 
         /* Return */
-        println("Built style with ID $id")
-        return Style(id, scale, icon)
-
+        return Style(id, scale, image)
     }
 
     @Throws(XmlPullParserException::class, IOException::class)

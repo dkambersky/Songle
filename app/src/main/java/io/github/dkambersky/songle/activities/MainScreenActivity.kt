@@ -5,11 +5,11 @@ import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.Song
 import io.github.dkambersky.songle.data.SongleContext
+import io.github.dkambersky.songle.network.CoroutineMapDownloader
 import io.github.dkambersky.songle.network.DownloadXmlTask
-import io.github.dkambersky.songle.network.listeners.SongMapListener
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
 import kotlinx.android.synthetic.main.activity_main_screen.*
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.launch
 
 
 class MainScreenActivity : BaseActivity() {
@@ -20,7 +20,7 @@ class MainScreenActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_screen)
 
-        /* Initialize context */
+        /* Initialize songleContext */
         songle.context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext, mutableSetOf(), "")
 
         /* Register listeners, set up UI */
@@ -64,15 +64,11 @@ class MainScreenActivity : BaseActivity() {
 
             downloadsInProgress.add(url)
 
-            async {
-                DownloadXmlTask(
-                        SongMapListener(
-                                songle.context,
-                                { finishMapDownload(url) },
-                                nextSong.num,
-                                level.toShort()
-                        )
-                ).execute(url)
+            launch {
+                CoroutineMapDownloader(
+                        songle.context,
+                        nextSong.num,
+                        level.toShort()).fetchMap(url)
             }
         }
 

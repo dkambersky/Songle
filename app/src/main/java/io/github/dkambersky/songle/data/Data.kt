@@ -1,6 +1,7 @@
 package io.github.dkambersky.songle.data
 
 import android.content.Context
+import android.graphics.Bitmap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import java.io.Serializable
@@ -14,7 +15,7 @@ data class Placemark(val name: String, val description: String, val style: Style
 /**
  * Defines a style for placemarks
  */
-data class Style(val id: String = "", val iconScale: Float = -1f, val icon: BitmapDescriptor? = null) : Serializable
+data class Style(val id: String = "", val iconScale: Float = -1f, val icon: Bitmap? = null) : Serializable
 
 
 /**
