@@ -8,6 +8,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 
+
 /** Listens for and handles the download of the songs database */
 class SongMapListener(var context: SongleContext,
                       private var callback: () -> Unit, private var id: Short = -1, private var level: Short = -1) : DownloadCompleteListener {
@@ -28,6 +29,7 @@ class SongMapListener(var context: SongleContext,
         outWriter.flush()
         outWriter.close()
 
+
         val map = MapParser(context).parse(result.byteInputStream())
 
         /* Load into the application
@@ -36,8 +38,12 @@ class SongMapListener(var context: SongleContext,
         context.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
 
 
+
+        println("SongMap thing ended!! wryy")
         /* Invoke callback, if specified*/
         callback.invoke()
+
+
     }
 
     private fun loadSongs(): List<Song> {
