@@ -10,10 +10,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.dkambersky.songle.R
-import io.github.dkambersky.songle.data.Difficulty
-import io.github.dkambersky.songle.data.Placemark
-import io.github.dkambersky.songle.data.Song
-import io.github.dkambersky.songle.data.Style
+import io.github.dkambersky.songle.data.defs.Difficulty
+import io.github.dkambersky.songle.data.defs.Placemark
+import io.github.dkambersky.songle.data.defs.Song
+import io.github.dkambersky.songle.data.defs.Style
+
 
 class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
@@ -36,10 +37,9 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
     private fun generateMap(difficulty: Difficulty, song: Song) {
         println("Song $song, Difficulty $difficulty")
 
-        val gameMap = songle.context.maps[song.num]
-                ?.get(difficulty
-                        .startMapMode.
-                        toShort())!!
+        val gameMap = songle.context.maps[song.num]?.get(difficulty
+                .startMapMode.
+                toShort())!!
 
 
         for (point in gameMap) {

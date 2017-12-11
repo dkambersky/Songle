@@ -6,8 +6,8 @@ import android.support.design.widget.Snackbar
 import android.text.Html
 import android.widget.Button
 import io.github.dkambersky.songle.R
-import io.github.dkambersky.songle.data.Difficulty
-import io.github.dkambersky.songle.data.Song
+import io.github.dkambersky.songle.data.defs.Difficulty
+import io.github.dkambersky.songle.data.defs.Song
 import kotlinx.android.synthetic.main.activity_pre_game.*
 import java.util.*
 

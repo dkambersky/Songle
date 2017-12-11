@@ -3,9 +3,9 @@ package io.github.dkambersky.songle.storage
 import android.graphics.BitmapFactory
 import android.util.Xml
 import com.google.android.gms.maps.model.LatLng
-import io.github.dkambersky.songle.data.Placemark
-import io.github.dkambersky.songle.data.SongleContext
-import io.github.dkambersky.songle.data.Style
+import io.github.dkambersky.songle.data.defs.Placemark
+import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.data.defs.Style
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParser.END_TAG
 import org.xmlpull.v1.XmlPullParser.TEXT

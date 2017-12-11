@@ -1,13 +1,11 @@
 package io.github.dkambersky.songle.network
 
-import io.github.dkambersky.songle.data.SongleContext
 import io.github.dkambersky.songle.storage.MapParser
+import io.github.dkambersky.songle.data.defs.SongleContext
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import java.io.File
 import java.io.FileWriter
-import java.io.IOException
-import java.io.InputStream
 import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -22,7 +20,7 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
         return async {
             urls.forEach {
                 val xml = downloadXml(it).await()
-                downloadComplete(xml)
+                processMapXml(xml)
             }
         }
     }
@@ -46,7 +44,7 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
     }
 
 
-    private fun downloadComplete(result: String?) {
+    private fun processMapXml(result: String?) {
         /* Sanity checks for ID */
 
         if (id == (-1).toShort()) return
@@ -65,42 +63,27 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
 
         val map = MapParser(songleContext).parse(result.byteInputStream())
 
-        /* Load into the application
-     *   TODO do this properly in the parser
-     */
         songleContext.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
-
-        /* Invoke callback, if specified*/
-        // TODO callback equivalent
     }
 
-    /* Loads the XML into a String representation */
+    /* Downloads an XML file given URL, returns as string */
     @Throws(SocketTimeoutException::class)
     private fun loadXmlFromNetwork(urlString: String): String {
 
-        val sb = StringBuilder()
-        val reader = downloadUrl(urlString).reader()
-
-
-        reader.forEachLine { sb.append(it) }
-
-        return sb.toString()
-
-    }
-
-    // Given a string representation of a URL, sets up a connection and gets
-    // an input stream.
-    @Throws(IOException::class)
-    private fun downloadUrl(urlString: String): InputStream {
-        val url = URL(urlString)
-        val conn = url.openConnection() as HttpURLConnection
+        /* Open connection */
+        val conn = URL(urlString).openConnection() as HttpURLConnection
         conn.readTimeout = 10000
         conn.connectTimeout = 15000
         conn.requestMethod = "GET"
         conn.doInput = true
-
         conn.connect()
-        return conn.inputStream
+        val reader = conn.inputStream.reader()
+        val sb = StringBuilder()
+
+        /* Write out and return */
+        reader.forEachLine { sb.append(it) }
+        return sb.toString()
+
     }
 
 

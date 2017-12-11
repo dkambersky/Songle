@@ -1,7 +1,8 @@
 package io.github.dkambersky.songle
 
 import android.app.Application
-import io.github.dkambersky.songle.data.SongleContext
+import io.github.dkambersky.songle.data.DataManager
+import io.github.dkambersky.songle.data.defs.SongleContext
 
 /**
  * Stores global songleContext information to avoid the overhead
@@ -9,4 +10,5 @@ import io.github.dkambersky.songle.data.SongleContext
  */
 class SongleApplication : Application() {
     lateinit var context: SongleContext
+    lateinit var data: DataManager
 }

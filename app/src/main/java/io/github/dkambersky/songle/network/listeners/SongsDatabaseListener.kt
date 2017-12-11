@@ -1,7 +1,7 @@
 package io.github.dkambersky.songle.network.listeners
 
-import io.github.dkambersky.songle.data.Song
-import io.github.dkambersky.songle.data.SongleContext
+import io.github.dkambersky.songle.data.defs.Song
+import io.github.dkambersky.songle.data.defs.SongleContext
 import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
 import java.io.FileInputStream

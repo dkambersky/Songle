@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.data
+package io.github.dkambersky.songle.data.defs
 
 /**
  * Holds information about difficulty levels
