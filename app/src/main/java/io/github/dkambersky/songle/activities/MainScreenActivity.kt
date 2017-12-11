@@ -10,18 +10,19 @@ import io.github.dkambersky.songle.network.DownloadXmlTask
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.coroutines.experimental.launch
+import java.util.*
 
 
 class MainScreenActivity : BaseActivity() {
 
-    private val downloadsInProgress: MutableSet<String> = mutableSetOf()
+    private val downloadsInProgress: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_screen)
 
         /* Initialize songleContext */
-        songle.context = SongleContext(mutableListOf(), mutableMapOf(), mutableMapOf(), applicationContext, mutableSetOf(), "")
+        songle.context = SongleContext(mutableListOf(), Collections.synchronizedMap(mutableMapOf()), Collections.synchronizedMap(mutableMapOf()), applicationContext, mutableSetOf(), "")
 
         /* Register listeners, set up UI */
         b_newGame.setOnClickListener({ transition(PreGameActivity::class.java) })
@@ -65,11 +66,14 @@ class MainScreenActivity : BaseActivity() {
             downloadsInProgress.add(url)
 
             launch {
-                CoroutineMapDownloader(
+                    CoroutineMapDownloader(
                         songle.context,
                         nextSong.num,
-                        level.toShort()).fetchMap(url)
+                        level.toShort()).fetchMap(url).await()
+                    finishMapDownload(url)
+
             }
+
         }
 
     }
@@ -77,9 +81,7 @@ class MainScreenActivity : BaseActivity() {
     private fun finishMapDownload(url: String) {
         downloadsInProgress.remove(url)
 
-
         /* If all downloads for current song completed, download next song. */
-
         if (downloadsInProgress.isEmpty()) updateStep()
 
     }

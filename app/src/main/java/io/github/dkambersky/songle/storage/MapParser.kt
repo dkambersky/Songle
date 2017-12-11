@@ -49,9 +49,10 @@ class MapParser(context: SongleContext) : BaseParser(context) {
             }
             when (parser.name) {
                 "Style" -> {
-                    val style =
-                            readStyle(parser)
-                    context.styles.put(style.id, style)
+                    val style = readStyle(parser)
+                    if (style != null) {
+                        context.styles.put(style.id, style)
+                    }
 
                 }
                 "Placemark" ->
@@ -66,13 +67,19 @@ class MapParser(context: SongleContext) : BaseParser(context) {
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readStyle(parser: XmlPullParser): Style {
-        println("Starting to ReadStyle... should get a confirmation below!")
+    private fun readStyle(parser: XmlPullParser): Style? {
+
         /* Ensure we're reading a Style */
         require(parser, "Style")
 
         /* Read info */
         val id = parser.getAttributeValue(ns, "id")
+
+        /* If we already know this style, don't bother building it again */
+        if (context.styles.containsKey(id)) {
+            skip(parser)
+            return null
+        }
         step(parser)
         require(parser, "IconStyle", true)
         val scale = readByTag(parser, "scale").toFloat()

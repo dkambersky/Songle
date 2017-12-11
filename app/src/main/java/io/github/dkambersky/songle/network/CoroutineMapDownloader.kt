@@ -10,18 +10,17 @@ import java.io.IOException
 import java.io.InputStream
 import java.lang.StringBuilder
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
 
 /**
  * Experimental coroutine downloadXml class
  */
-
 class CoroutineMapDownloader(private var songleContext: SongleContext,
                              private var id: Short = -1, private var level: Short = -1) {
-    fun fetchMap(vararg urls: String) {
-        async {
+    fun fetchMap(vararg urls: String): Deferred<Unit> {
+        return async {
             urls.forEach {
-                println("Starting download of $it")
                 val xml = downloadXml(it).await()
                 downloadComplete(xml)
             }
@@ -32,14 +31,24 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
     private fun downloadXml(url: String): Deferred<String> {
 
         return async {
-            loadXmlFromNetwork(url)
+            var result: String
+            while (true) {
+
+                try {
+                    result = loadXmlFromNetwork(url)
+                    break
+                } catch (e: SocketTimeoutException) {
+                    println("Download of $url timed out.")
+                }
+            }
+            result
         }
     }
 
 
     private fun downloadComplete(result: String?) {
         /* Sanity checks for ID */
-        println("DownloadComplete firing ")
+
         if (id == (-1).toShort()) return
         if (result == null) {
             System.err.println("Map downloadXml failed! id $id, level $level")
@@ -54,7 +63,6 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
         outWriter.close()
 
 
-        println("Trying to parse thing ")
         val map = MapParser(songleContext).parse(result.byteInputStream())
 
         /* Load into the application
@@ -62,19 +70,22 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
      */
         songleContext.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
 
-        println("Maps: ${songleContext.maps}")
         /* Invoke callback, if specified*/
         // TODO callback equivalent
     }
 
     /* Loads the XML into a String representation */
+    @Throws(SocketTimeoutException::class)
     private fun loadXmlFromNetwork(urlString: String): String {
+
         val sb = StringBuilder()
         val reader = downloadUrl(urlString).reader()
+
 
         reader.forEachLine { sb.append(it) }
 
         return sb.toString()
+
     }
 
     // Given a string representation of a URL, sets up a connection and gets
