@@ -2,6 +2,7 @@ package io.github.dkambersky.songle.network
 
 import android.os.AsyncTask
 import io.github.dkambersky.songle.network.listeners.DownloadCompleteListener
+import kotlinx.coroutines.experimental.launch
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
@@ -14,7 +15,7 @@ import java.net.URL
  */
 class DownloadXmlTask(private val caller: DownloadCompleteListener) :
         AsyncTask<String, Void, String>() {
-    override fun doInBackground(vararg urls: String): String?{
+    override fun doInBackground(vararg urls: String): String? {
         try {
             return loadXmlFromNetwork(urls[0])
         } catch (e: IOException) {
@@ -30,7 +31,7 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
 
     /* Loads the XML into a String representation */
     private fun loadXmlFromNetwork(urlString: String): String {
-        val sb =StringBuilder()
+        val sb = StringBuilder()
         val reader = downloadUrl(urlString).reader()
 
         reader.forEachLine { sb.append(it) }
@@ -56,7 +57,7 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
 
     override fun onPostExecute(result: String?) {
         super.onPostExecute(result)
-        caller.downloadComplete(result)
+        launch { caller.downloadComplete(result) }
     }
 
 }

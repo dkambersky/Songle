@@ -1,6 +1,5 @@
 package io.github.dkambersky.songle.activities
 
-
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
@@ -10,6 +9,7 @@ import io.github.dkambersky.songle.network.DownloadXmlTask
 import io.github.dkambersky.songle.network.listeners.SongMapListener
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
 import kotlinx.android.synthetic.main.activity_main_screen.*
+import kotlinx.coroutines.experimental.*
 
 
 class MainScreenActivity : BaseActivity() {
@@ -63,15 +63,17 @@ class MainScreenActivity : BaseActivity() {
             val url = "${songle.context.root}${nextSong.id()}/map$level.kml"
 
             downloadsInProgress.add(url)
-            DownloadXmlTask(
-                    SongMapListener(
-                            songle.context,
-                            { finishMapDownload(url) },
-                            nextSong.num,
-                            level.toShort()
-                    )
-            ).execute(url)
 
+            async {
+                DownloadXmlTask(
+                        SongMapListener(
+                                songle.context,
+                                { finishMapDownload(url) },
+                                nextSong.num,
+                                level.toShort()
+                        )
+                ).execute(url)
+            }
         }
 
     }
@@ -85,7 +87,6 @@ class MainScreenActivity : BaseActivity() {
         if (downloadsInProgress.isEmpty()) updateStep()
 
     }
-
 
     private fun snackShowFinished(snackbarUpdating: Snackbar) {
         snackbarUpdating.dismiss()

@@ -1,5 +1,6 @@
 package io.github.dkambersky.songle.network.listeners
 
+
 import io.github.dkambersky.songle.data.Song
 import io.github.dkambersky.songle.data.SongleContext
 import io.github.dkambersky.songle.storage.MapParser
@@ -33,8 +34,8 @@ class SongMapListener(var context: SongleContext,
         val map = MapParser(context).parse(result.byteInputStream())
 
         /* Load into the application
-         *   TODO do this properly in the parser
-         */
+     *   TODO do this properly in the parser
+     */
         context.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
 
 
@@ -42,9 +43,8 @@ class SongMapListener(var context: SongleContext,
         println("SongMap thing ended!! wryy")
         /* Invoke callback, if specified*/
         callback.invoke()
-
-
     }
+
 
     private fun loadSongs(): List<Song> {
         return SongsParser(context)
