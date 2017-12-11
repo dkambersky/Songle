@@ -10,7 +10,9 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.Difficulty
+import io.github.dkambersky.songle.data.Placemark
 import io.github.dkambersky.songle.data.Song
+import io.github.dkambersky.songle.data.Style
 
 class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
@@ -30,14 +32,18 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
     }
 
 
-    private fun generateMap(difficulty: Difficulty, song: Song, map: GoogleMap) {
+    private fun generateMap(difficulty: Difficulty, song: Song) {
         println("Song $song, Difficulty $difficulty")
 
-        val gameMap = songle.context.maps[song.num]?.get(difficulty.startMapMode.toShort())!!
+        val gameMap = songle.context.maps[song.num]
+                ?.get(difficulty
+                        .startMapMode.
+                        toShort())!!
 
 
         for (point in gameMap) {
-            map.addMarker(MarkerOptions().position(point.loc))
+            addMarker(point)
+
         }
 
     }
@@ -45,7 +51,7 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
+        println("OnMapReady firing")
         /* Load dark mode */
         googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
@@ -53,7 +59,6 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
 
         /* Default to Crichton St */
         val crichton = LatLng(55.944575, -3.187129)
-        mMap.addMarker(MarkerOptions().position(crichton).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(crichton))
 
         try {
@@ -69,9 +74,18 @@ class InGameActivity : BaseActivity(), OnMapReadyCallback {
         /* Generate the game map */
         generateMap(
                 intent.extras["Difficulty"] as Difficulty,
-                intent.extras["Song"] as Song,
-                mMap)
+                intent.extras["Song"] as Song)
 
 
+    }
+
+
+    private fun addMarker(loc: LatLng, title: String, style: Style) {
+
+        mMap.addMarker(MarkerOptions().position(loc).title(title).icon(style.icon))
+    }
+
+    private fun addMarker(point: Placemark) {
+        addMarker(point.loc, point.description, point.style)
     }
 }

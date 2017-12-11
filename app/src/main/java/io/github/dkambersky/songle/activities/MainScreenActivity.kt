@@ -52,6 +52,7 @@ class MainScreenActivity : BaseActivity() {
             nextSong = songle.context.songs.first { !songle.context.maps.containsKey(it.num) }
         } catch (e: NoSuchElementException) {
             /* Return if everything is downloaded */
+            println("Completed downloading all songs")
             return
         }
 
@@ -80,6 +81,7 @@ class MainScreenActivity : BaseActivity() {
 
 
         /* If all downloads for current song completed, download next song. */
+
         if (downloadsInProgress.isEmpty()) updateStep()
 
     }
