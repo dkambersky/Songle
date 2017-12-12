@@ -1,9 +1,12 @@
 package io.github.dkambersky.songle.activities
 
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.definitions.Difficulty
@@ -14,7 +17,8 @@ import io.github.dkambersky.songle.data.definitions.Song
 class InGameActivity : MapActivity() {
     private lateinit var gameMap: MutableList<Placemark>
     private lateinit var difficulty: Difficulty
-    lateinit var song: Song
+    private lateinit var song: Song
+    private val mapElements = mutableMapOf<String, Any>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,12 +38,14 @@ class InGameActivity : MapActivity() {
                         this, R.raw.style_json))
 
 
-        /* General map preferences */
+        /* Game map look and feel */
         map.setMaxZoomPreference(22f)
         map.animateCamera(CameraUpdateFactory.zoomTo(18f))
         map.setMinZoomPreference(14f)
         map.uiSettings.isCompassEnabled = true
         map.uiSettings.setAllGesturesEnabled(true)
+        map.uiSettings.isMyLocationButtonEnabled = false
+
 
         /* Generate the game map */
         generateMap(difficulty, song)
@@ -59,6 +65,19 @@ class InGameActivity : MapActivity() {
         if (current == null || !::gameMap.isInitialized) return
 
         map.animateCamera(CameraUpdateFactory.newLatLng(current.toLatLng()))
+
+
+        /* Visualize pickup radius */
+        val circle = mapElements["pickup"]
+        if (circle is Circle) {
+            circle.remove()
+        }
+
+        mapElements.put("pickup", map.addCircle(CircleOptions()
+                .radius(difficulty.pickupRange.toDouble())
+                .center(current.toLatLng())
+                .fillColor(Color.CYAN)))
+
 
         gameMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { collect(it) }
 

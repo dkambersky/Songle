@@ -78,7 +78,7 @@ abstract class MapActivity : BaseActivity(),
                     length = Snackbar.LENGTH_INDEFINITE)
         }
 
-        map.uiSettings.isMyLocationButtonEnabled = true
+
     }
 
     /* Add a placemark*/
