@@ -2,7 +2,7 @@ package io.github.dkambersky.songle
 
 import android.app.Application
 import io.github.dkambersky.songle.data.DataManager
-import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.data.definitions.SongleContext
 
 /**
  * Stores global songleContext information to avoid the overhead

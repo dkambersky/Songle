@@ -2,8 +2,8 @@ package io.github.dkambersky.songle.storage
 
 import android.annotation.SuppressLint
 import android.util.Xml
-import io.github.dkambersky.songle.data.defs.Song
-import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.data.definitions.Song
+import io.github.dkambersky.songle.data.definitions.SongleContext
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.FileInputStream

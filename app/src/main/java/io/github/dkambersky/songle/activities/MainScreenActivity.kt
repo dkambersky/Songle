@@ -3,8 +3,10 @@ package io.github.dkambersky.songle.activities
 import android.os.Bundle
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.DataManager
-import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.data.definitions.SongleContext
 import kotlinx.android.synthetic.main.activity_main_screen.*
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 
@@ -26,11 +28,16 @@ class MainScreenActivity : BaseActivity() {
 
         b_newGame.isEnabled = false
 
-        /* Check for updates, populate maps */
-        songle.data.initialize()
+        /* Load data */
+        initialize()
     }
 
 
-
-
+    private fun initialize() {
+        /* Launch non-blocking init co-routine */
+        launch {
+            async { songle.data.initialize() }.await()
+            b_newGame.isEnabled = true
+        }
+    }
 }

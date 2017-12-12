@@ -1,7 +1,7 @@
 package io.github.dkambersky.songle.network.listeners
 
-import io.github.dkambersky.songle.data.defs.Song
-import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.data.definitions.Song
+import io.github.dkambersky.songle.data.definitions.SongleContext
 import io.github.dkambersky.songle.storage.SongsParser
 import java.io.File
 import java.io.FileInputStream
@@ -9,6 +9,7 @@ import java.io.FileWriter
 
 /** Listens for and handles the download of the songs database */
 class SongsDatabaseListener() : DownloadCompleteListener {
+
 
     private lateinit var context: SongleContext
     private lateinit var callback: () -> Unit
@@ -35,9 +36,7 @@ class SongsDatabaseListener() : DownloadCompleteListener {
 
         val songs = SongsParser(context).parse(result.byteInputStream()) ?: loadSongs()
 
-
         context.songs.addAll(songs)
-
 
         /* Invoke callback, if specified*/
         callback.invoke()

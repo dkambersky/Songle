@@ -1,6 +1,6 @@
 package io.github.dkambersky.songle.network
 
-import io.github.dkambersky.songle.data.defs.SongleContext
+import io.github.dkambersky.songle.data.definitions.SongleContext
 import io.github.dkambersky.songle.storage.MapParser
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
@@ -46,7 +46,6 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
 
     private fun processMapXml(result: String?) {
         /* Sanity checks for ID */
-
         if (id == (-1).toShort()) return
         if (result == null) {
             System.err.println("Map downloadXml failed! id $id, level $level")

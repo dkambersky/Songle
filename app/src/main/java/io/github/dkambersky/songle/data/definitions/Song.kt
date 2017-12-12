@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.data.defs
+package io.github.dkambersky.songle.data.definitions
 
 import java.io.Serializable
 

@@ -1,4 +1,4 @@
-package io.github.dkambersky.songle.data.defs
+package io.github.dkambersky.songle.data.definitions
 
 import com.google.android.gms.maps.model.LatLng
 import java.io.Serializable

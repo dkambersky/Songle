@@ -2,8 +2,8 @@ package io.github.dkambersky.songle.data
 
 import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.SongleApplication
-import io.github.dkambersky.songle.data.defs.Placemark
-import io.github.dkambersky.songle.data.defs.Song
+import io.github.dkambersky.songle.data.definitions.Placemark
+import io.github.dkambersky.songle.data.definitions.Song
 import io.github.dkambersky.songle.network.CoroutineMapDownloader
 import io.github.dkambersky.songle.network.DownloadXmlTask
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
