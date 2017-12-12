@@ -19,7 +19,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.definitions.Placemark
-import io.github.dkambersky.songle.data.definitions.Style
 
 /**
  * Common Map activity class.
@@ -55,25 +54,13 @@ abstract class MapActivity : BaseActivity(),
 
     }
 
-
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         initLocServices()
     }
 
-    private fun addMarker(loc: LatLng, title: String, style: Style) {
-        map.addMarker(
-                MarkerOptions()
-                        .position(loc)
-                        .title(title)
-                        .icon(BitmapDescriptorFactory.fromBitmap(style.icon)))
-    }
 
-    protected fun addMarker(point: Placemark) {
-        addMarker(point.loc, point.description, point.style)
-    }
-
-
+    /* Try requesting permissions */
     private fun initLocServices() {
         try {
             // Visualise current position with a small blue circle
@@ -94,26 +81,39 @@ abstract class MapActivity : BaseActivity(),
         map.uiSettings.isMyLocationButtonEnabled = true
     }
 
-    override fun onStart() {
-        super.onStart()
-        apiClient.connect()
+    /* Add a placemark*/
+    protected fun addMarker(point: Placemark) {
+        point.marker = map.addMarker(
+                MarkerOptions()
+                        .position(point.loc)
+                        .title(point.name)
+                        .icon(BitmapDescriptorFactory.fromBitmap(point.style.icon)))
     }
 
-    override fun onStop() {
-        super.onStop()
-        if (apiClient.isConnected) {
-            apiClient.disconnect()
-        }
+
+    /* QoL extension functions for Location */
+    fun Location.toLatLng(): LatLng {
+        return LatLng(latitude, longitude)
     }
 
-    fun createLocationRequest() {
-// Set the parameters for the location request
+    fun Location.distanceTo(latLng: LatLng): Float {
+        val other = Location("")
+        other.longitude = latLng.longitude
+        other.latitude = latLng.latitude
+        return distanceTo(other)
+    }
+
+    fun Location.distanceTo(placemark: Placemark): Float = distanceTo(placemark.loc)
+
+    /* Connection related boilerplate*/
+    private fun createLocationRequest() {
+        // Set the parameters for the location request
         val mLocationRequest = LocationRequest()
         mLocationRequest.interval = 5000 // preferably every 5 seconds
         mLocationRequest.fastestInterval = 1000 // at most every second
         mLocationRequest.priority =
                 LocationRequest.PRIORITY_HIGH_ACCURACY
-// Can we access the user’s current location?
+        // Can we access the user’s current location?
         val permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
@@ -124,7 +124,6 @@ abstract class MapActivity : BaseActivity(),
 
     override fun onConnected(connectionHint: Bundle?) {
         createLocationRequest()
-
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -143,20 +142,6 @@ abstract class MapActivity : BaseActivity(),
         }
     }
 
-
-    override fun onLocationChanged(current: Location?) {
-        if (current == null) {
-            println("[onLocationChanged] Location unknown")
-        } else {
-            println(""" [onLocationChanged] Lat/long now
-            (${current.latitude},
-            ${current.longitude})"""
-            )
-// Do something with current location
-            println(current)
-        }
-    }
-
     override fun onConnectionSuspended(flag: Int) {
         println(" >>>> onConnectionSuspended")
     }
@@ -168,4 +153,15 @@ abstract class MapActivity : BaseActivity(),
         println(" > > > > onConnectionFailed ")
     }
 
+    override fun onStart() {
+        super.onStart()
+        apiClient.connect()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (apiClient.isConnected) {
+            apiClient.disconnect()
+        }
+    }
 }
