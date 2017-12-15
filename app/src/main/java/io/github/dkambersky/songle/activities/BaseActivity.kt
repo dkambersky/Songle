@@ -9,7 +9,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import io.github.dkambersky.songle.SongleApplication
-import kotlinx.android.synthetic.main.activity_main_screen.*
 import java.io.Serializable
 
 
@@ -49,10 +48,7 @@ abstract class BaseActivity : AppCompatActivity() {
     fun <T> transition(activity: Class<T>, vararg data: Pair<String, Serializable>): Boolean where T : Activity {
         val intent = Intent(this, activity)
 
-        for (pair in data) {
-            intent.putExtra(pair.first, pair.second)
-        }
-
+        data.forEach { intent.putExtra(it.first, it.second) }
 
         startActivity(intent)
         return true
@@ -68,7 +64,6 @@ abstract class BaseActivity : AppCompatActivity() {
         return bar
 
     }
-
 
 
 }

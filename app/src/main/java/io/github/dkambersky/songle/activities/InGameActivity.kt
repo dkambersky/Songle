@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.activity_in_game.*
 
 class InGameActivity : MapActivity() {
     private lateinit var gameMap: MutableList<Placemark>
+    private lateinit var allWords: List<Placemark>
     private lateinit var difficulty: Difficulty
     private lateinit var song: Song
     private lateinit var mapState: GameState
@@ -32,7 +33,7 @@ class InGameActivity : MapActivity() {
         song = intent.extras["Song"] as Song
 
         /* Register listeners */
-        b_view_progress.setOnClickListener { transition(GameProgressActivity::class.java) }
+        b_view_progress.setOnClickListener { transition(GameProgressActivity::class.java, Pair("marks", allWords.toTypedArray())) }
         b_guess.setOnClickListener { transition(GameProgressActivity::class.java) }
 
 
@@ -58,6 +59,7 @@ class InGameActivity : MapActivity() {
         /* Generate the game map */
         generateMap(difficulty, song)
 
+
     }
 
 
@@ -74,6 +76,8 @@ class InGameActivity : MapActivity() {
                 gameMap.size.div(5 - difficulty.startMapMode)
         )
 
+
+        allWords = gameMap.toList()
     }
 
     override fun onLocationChanged(current: Location?) {
