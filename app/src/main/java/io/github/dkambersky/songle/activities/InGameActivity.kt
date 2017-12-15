@@ -3,6 +3,8 @@ package io.github.dkambersky.songle.activities
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
+import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
@@ -19,6 +21,7 @@ import kotlinx.android.synthetic.main.activity_in_game.*
 class InGameActivity : MapActivity() {
     private lateinit var gameMap: MutableList<Placemark>
     private lateinit var allWords: List<Placemark>
+    private lateinit var collected: MutableMap<Int, MutableMap<Int, Boolean>>
     private lateinit var difficulty: Difficulty
     private lateinit var song: Song
     private lateinit var mapState: GameState
@@ -28,15 +31,43 @@ class InGameActivity : MapActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        /* UI settings */
+        revievView.movementMethod = ScrollingMovementMethod()
+
         /* Load data from intent */
         difficulty = intent.extras["Difficulty"] as Difficulty
         song = intent.extras["Song"] as Song
 
         /* Register listeners */
-        b_view_progress.setOnClickListener { transition(GameProgressActivity::class.java, Pair("marks", allWords.toTypedArray())) }
-        b_guess.setOnClickListener { transition(GameProgressActivity::class.java) }
+        b_view_progress.setOnClickListener { updateReview(); toggleReview() }
+        b_guess.setOnClickListener { }
 
 
+    }
+
+    private fun updateReview() {
+        val builder = StringBuilder()
+
+        for (iLine in 0 until song.lyrics.size) {
+            val line = song.lyrics[iLine] ?: continue
+            for (iWord in 0 until line.size) {
+
+                if (collected[iLine]?.get(iWord) == true) {
+                    builder.append(line[iWord])
+                } else {
+                    builder.append("?")
+                }
+                builder.append(" ")
+            }
+            builder.append("\n")
+        }
+
+        revievView.text = builder.toString()
+    }
+
+    private fun toggleReview() {
+        revievView.visibility = if (revievView.visibility == View.GONE) View.VISIBLE else View.GONE
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -78,6 +109,13 @@ class InGameActivity : MapActivity() {
 
 
         allWords = gameMap.toList()
+
+
+        /* Initialize the 'collected' map */
+        collected = mutableMapOf()
+        gameMap.forEach {
+            collected.getOrPut(it.lyricPos.first, { mutableMapOf() }).put(it.lyricPos.second, false)
+        }
     }
 
     override fun onLocationChanged(current: Location?) {
@@ -98,12 +136,20 @@ class InGameActivity : MapActivity() {
                 .center(current.toLatLng())
                 .fillColor(Color.CYAN)))
 
+        /* Pick up objects in range */
         gameMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { collect(it) }
+
         updateGameState()
 
     }
 
     private fun updateGameState() {
+        /* Update review on the fly if open */
+        if (revievView.visibility == View.VISIBLE) {
+            updateReview()
+        }
+
+
         /* Resolve map level upgrade */
         if (mapState.currentThreshold == mapState.pickedUpPlacemarks) {
             increaseLevel()
@@ -135,6 +181,7 @@ class InGameActivity : MapActivity() {
         placemark.marker?.remove()
         gameMap.remove(placemark)
 
+        collected[placemark.lyricPos.first]!!.put(placemark.lyricPos.second, true)
         mapState.pickedUpPlacemarks++
 
     }
