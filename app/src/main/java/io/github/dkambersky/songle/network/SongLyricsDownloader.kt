@@ -49,13 +49,27 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
         outWriter.close()
 
 
-        println("Saving lyrics for $id")
+
         /* Save lyrics to Song object */
 
-        
+
+        val map = mutableMapOf<Int, List<String>>()
+        for (line in result.lines()) {
+            if (line == "") {
+                break
+            }
+
+            val index = line.substring(0, 7).trim(' ', '\t').toInt()
+            val words = line.substring(7).split(" ", ", ")
+
+            map.put(index, words)
 
 
+        }
 
+
+        songleContext.songs[id].lyrics = map
+    
 //        val lyrics = result.lines().map { line ->
 //
 //            Pair(/*line.substring(0, 7).trim(' ', '\t').toInt()*/5,
@@ -72,7 +86,7 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
 //        var e = listOf(d, d).toMap()
 //
 //        val lyrics = e
-        println("Lyrics are $lyrics")
+//        println("Lyrics are $lyrics")
 //        songleContext.songs[id].lyrics = lyrics
     }
 
