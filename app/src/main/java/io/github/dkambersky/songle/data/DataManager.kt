@@ -14,6 +14,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.io.FileInputStream
+import java.lang.StringBuilder
 import java.util.*
 
 /* Manages file downloads and storage */
@@ -49,18 +50,21 @@ class DataManager(private val songle: SongleApplication,
         launch {
             jobs.forEach {
                 it.await()
-                println("Download of lyrics for $it completed")
             }
-            println(" Completed downloading lyrics, going for maps")
+            println("Completed downloading lyrics, going for maps")
             fetchSongMapStep()
         }
     }
 
-    private fun fetchSongLyrics(song: Song): Int {
+    private suspend fun fetchSongLyrics(song: Song): Int {
 
         val file = File(songle.filesDir, "${song.id()}.lyrics")
 
-
+        if (file.isFile) {
+            println("Loading lyrics from file $file")
+            async { loadLyrics(file, song.num - 1) }.await()
+            return song.num
+        }
 
         SongLyricsDownloader(
                 songle.context,
@@ -90,9 +94,7 @@ class DataManager(private val songle: SongleApplication,
                 nextSong.urls().map { "${songle.context.root}$it" }
         )
 
-
-
-        println("Fetching song $nextSong")
+        println("Fetching song ${nextSong.id()}: ${nextSong.title}")
         /* Download the levels in parallel */
         for (level in 1..5) {
             val file = files[level - 1]
@@ -141,6 +143,24 @@ class DataManager(private val songle: SongleApplication,
 
     private fun loadMap(file: File): Deferred<List<Placemark>> {
         return async { MapParser(songle.context).parse(FileInputStream(file)) }
+    }
+
+    private fun loadLyrics(file: File, id: Int) {
+        val reader = file.reader()
+        val sb = StringBuilder()
+
+        /* Write out and return */
+        reader.forEachLine { sb.append(it + "\n") }
+
+        /* Save lyrics to Song object */
+        val lyrics = sb.toString().lines()
+                .filter { it != "" }
+                .map { line ->
+                    Pair(line.substring(0, 7).trim(' ', '\t').toInt(),
+                            line.substring(7).split(" ", ", "))
+                }.toMap()
+
+        songle.context.songs[id].lyrics = lyrics
     }
 
     private fun snackShowFinished(snackbarUpdating: Snackbar) {

@@ -41,7 +41,6 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
 
 
     private suspend fun processLyrics(result: String) {
-
         /* Save the downloaded lyrics into a file */
         val outWriter = FileWriter(file)
         outWriter.write(result)
@@ -49,45 +48,15 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
         outWriter.close()
 
 
-
         /* Save lyrics to Song object */
+        val lyrics = result.lines()
+                .filter { it != "" }
+                .map { line ->
+                    Pair(line.substring(0, 7).trim(' ', '\t').toInt(),
+                            line.substring(7).split(" ", ", "))
+                }.toMap()
 
-
-        val map = mutableMapOf<Int, List<String>>()
-        for (line in result.lines()) {
-            if (line == "") {
-                break
-            }
-
-            val index = line.substring(0, 7).trim(' ', '\t').toInt()
-            val words = line.substring(7).split(" ", ", ")
-
-            map.put(index, words)
-
-
-        }
-
-
-        songleContext.songs[id].lyrics = map
-    
-//        val lyrics = result.lines().map { line ->
-//
-//            Pair(/*line.substring(0, 7).trim(' ', '\t').toInt()*/5,
-//                    line.substring(7)/*.split(" ", ", ")*/)
-//        }
-//        println("LMAO")
-
-//        var a = result.lines()[1]
-//        var b = a.substring(0, 7).trim(' ', '\t').toInt()
-//        println(b)
-//        var c = a.substring(7).split(" ", ", ")
-//
-//        var d = Pair(b, c)
-//        var e = listOf(d, d).toMap()
-//
-//        val lyrics = e
-//        println("Lyrics are $lyrics")
-//        songleContext.songs[id].lyrics = lyrics
+        songleContext.songs[id-1].lyrics = lyrics
     }
 
     /* Downloads an XML file given URL, returns as string */

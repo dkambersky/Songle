@@ -66,7 +66,6 @@ class PreGameActivity : BaseActivity() {
         diffButtons.map { it.setTextColor(resources.getColor(R.color.blackOverlay, theme)) }
         button.setTextColor(resources.getColor(R.color.white, theme))
 
-
     }
 
     private fun getSong(): Song {
