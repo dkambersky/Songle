@@ -22,11 +22,11 @@ class MainScreenActivity : BaseActivity() {
         songle.data = DataManager(songle)
 
         /* Register listeners, set up UI */
-        b_newGame.setOnClickListener({ transition(PreGameActivity::class.java) })
+        b_exit.setOnClickListener({ transition(PreGameActivity::class.java) })
         b_settings.setOnClickListener({ transition(SettingsActivity::class.java) })
         b_about.setOnClickListener({ transition(AboutActivity::class.java) })
 
-        b_newGame.isEnabled = false
+        b_exit.isEnabled = false
 
         /* Load data */
         initialize()
@@ -37,7 +37,7 @@ class MainScreenActivity : BaseActivity() {
         /* Launch non-blocking init co-routine */
         launch {
             async { songle.data.initialize() }.await()
-            b_newGame.isEnabled = true
+            b_exit.isEnabled = true
         }
     }
 }

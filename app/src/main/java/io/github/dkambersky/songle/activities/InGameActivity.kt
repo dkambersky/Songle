@@ -24,6 +24,8 @@ import kotlinx.android.synthetic.main.activity_in_game.*
 
 
 class InGameActivity : MapActivity() {
+
+    /* Variables */
     private lateinit var gameMap: MutableList<Placemark>
     private lateinit var allWords: List<Placemark>
     private lateinit var collected: MutableMap<Int, MutableMap<Int, Boolean>>
@@ -31,8 +33,9 @@ class InGameActivity : MapActivity() {
     private lateinit var song: Song
     private lateinit var gameState: GameState
     private val mapElements = mutableMapOf<String, Any>()
+    private var gameShown: Boolean = false
 
-
+    /* Map functionality */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,79 +53,18 @@ class InGameActivity : MapActivity() {
         difficulty = intent.extras["Difficulty"] as Difficulty
         song = intent.extras["Song"] as Song
 
+        println("SONG NAME ${song.title}")
+
         /* Register listeners */
-        b_view_progress.setOnClickListener { updateReview(); toggleVisibility(revievView) }
-        b_guess.setOnClickListener { toggleVisibility(nameInputField); toggleVisibility(t_guessInfo) }
-        nameInputField.setOnKeyListener { _, keycode, event -> handleInput(keycode, event) }
-
-    }
-
-    private fun handleInput(keyCode: Int, event: KeyEvent): Boolean {
-        if ((event.action == KeyEvent.ACTION_DOWN) &&
-                (keyCode == KeyEvent.KEYCODE_ENTER)) {
-            makeGuess()
-            return true
-        }
-        return false
-    }
-
-    private fun makeGuess() {
-
-        val guess = nameInputField.text.toString()
-
-        /* Clean up */
-        nameInputField.setText("")
-        toggleVisibility(nameInputField)
-        toggleVisibility(t_guessInfo)
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-                .hideSoftInputFromWindow(currentFocus.windowToken, 0)
-        nameInputField.clearFocus()
-
-
-        /* Guess */
-        if (guess.equals(song.title, ignoreCase = true)) {
-            println("User won!")
-        } else {
-            println("user guessed incorrectly.")
-            if (gameState.guessesLeft > 0) {
-                gameState.guessesLeft--
-                if (gameState.guessesLeft == 0) {
-                    println("User has lost!")
-                }
-            }
+        b_view_progress.setOnClickListener { updateHintView(); toggleVisibility(revievView) }
+        nameInputField.setOnKeyListener { _, keycode, event -> handleGuessDialogInput(keycode, event) }
+        b_guess.setOnClickListener {
+            toggleVisibility(nameInputField)
+            toggleVisibility(t_guessInfo)
+            revievView.visibility = View.GONE
         }
 
-        /* Update guess counter */
-        updateGuessCounter()
     }
-
-    @SuppressLint("SetTextI18n")
-    private fun updateGuessCounter() {
-        t_guessInfo.text = "Guesses left: ${if (gameState.guessesLeft == -1) "∞" else gameState.guessesLeft.toString()}"
-    }
-
-
-    private fun updateReview() {
-        val builder = StringBuilder()
-
-        for (iLine in 0 until song.lyrics.size) {
-            val line = song.lyrics[iLine] ?: continue
-            for (iWord in 0 until line.size) {
-
-                if (collected[iLine]?.get(iWord) == true) {
-                    builder.append(line[iWord])
-                } else {
-                    builder.append("?")
-                }
-                builder.append(" ")
-            }
-            builder.append("\n")
-        }
-
-        revievView.text = builder.toString()
-    }
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         super.onMapReady(googleMap)
@@ -146,34 +88,6 @@ class InGameActivity : MapActivity() {
 
 
     }
-
-
-    private fun generateMap(difficulty: Difficulty, song: Song) {
-        gameMap = songle.context.maps[song.num]?.
-                get(difficulty.startMapMode)!!.toMutableList()
-        gameMap.forEach { addMarker(it) }
-
-        gameState = GameState(
-                gameMap.size,
-                difficulty.startMapMode,
-                0,
-                gameMap.size.div(5 - difficulty.startMapMode),
-                gameMap.size.div(5 - difficulty.startMapMode),
-                difficulty.guessAttempts
-        )
-
-
-        allWords = gameMap.toList()
-
-
-        /* Initialize the 'collected' map */
-        collected = mutableMapOf()
-        gameMap.forEach {
-            collected.getOrPut(it.lyricPos.first, { mutableMapOf() }).put(it.lyricPos.second, false)
-        }
-    }
-
-    private var gameShown: Boolean = false
 
     override fun onLocationChanged(current: Location?) {
         /* Don't process null locations, wait for map's initialization */
@@ -223,10 +137,38 @@ class InGameActivity : MapActivity() {
 
     }
 
+
+    /* Game functionality */
+    private fun generateMap(difficulty: Difficulty, song: Song) {
+        gameMap = songle.context.maps[song.num]?.
+                get(difficulty.startMapMode)!!.toMutableList()
+        gameMap.forEach { addMarker(it) }
+
+        gameState = GameState(
+                gameMap.size,
+                difficulty.startMapMode,
+                0,
+                gameMap.size.div(5 - difficulty.startMapMode),
+                gameMap.size.div(5 - difficulty.startMapMode),
+                difficulty.guessAttempts
+        )
+
+
+        allWords = gameMap.toList()
+
+
+        /* Initialize the 'collected' map */
+        collected = mutableMapOf()
+        gameMap.forEach {
+            collected.getOrPut(it.lyricPos.first, { mutableMapOf() }).put(it.lyricPos.second, false)
+        }
+    }
+
+
     private fun updateGameState() {
         /* Update review on the fly if open */
         if (revievView.visibility == View.VISIBLE) {
-            updateReview()
+            updateHintView()
         }
 
 
@@ -263,5 +205,88 @@ class InGameActivity : MapActivity() {
         gameState.pickedUpPlacemarks++
 
     }
+
+    private fun makeGuess() {
+
+        val guess = nameInputField.text.toString()
+
+        /* Clean up */
+        nameInputField.setText("")
+        toggleVisibility(nameInputField)
+        toggleVisibility(t_guessInfo)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                .hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        nameInputField.clearFocus()
+
+
+        /* Guess */
+        if (guess.equals(song.title, ignoreCase = true)) {
+            endGameVictory()
+        } else {
+            if (gameState.guessesLeft > 0) {
+                gameState.guessesLeft--
+                if (gameState.guessesLeft == 0) {
+                    endGameLoss()
+                }
+            }
+        }
+
+        /* Update guess counter */
+        updateGuessCounter()
+    }
+
+    private fun endGameVictory() {
+        transition(
+                GameSummaryActivity::class.java,
+                Pair("song", song.num),
+                Pair("state", true)
+        )
+    }
+
+    private fun endGameLoss() {
+        transition(
+                GameSummaryActivity::class.java,
+                Pair("song", song.num),
+                Pair("state", false)
+        )
+    }
+
+
+    /* UI functionality */
+    private fun handleGuessDialogInput(keyCode: Int, event: KeyEvent): Boolean {
+        if ((event.action == KeyEvent.ACTION_DOWN) &&
+                (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            makeGuess()
+            return true
+        }
+        return false
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateGuessCounter() {
+        t_guessInfo.text = "Guesses left: ${if (gameState.guessesLeft == -1) "∞" else gameState.guessesLeft.toString()}"
+    }
+
+    private fun updateHintView() {
+        val builder = StringBuilder()
+
+        for (iLine in 0 until song.lyrics.size) {
+            val line = song.lyrics[iLine] ?: continue
+            for (iWord in 0 until line.size) {
+
+                if (collected[iLine]?.get(iWord) == true) {
+                    builder.append(line[iWord])
+                } else {
+                    builder.append("?")
+                }
+                builder.append(" ")
+            }
+            builder.append("\n")
+        }
+
+        revievView.text = builder.toString()
+    }
+
 
 }
