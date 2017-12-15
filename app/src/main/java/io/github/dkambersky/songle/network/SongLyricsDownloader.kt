@@ -18,7 +18,7 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
         return async {
             urls.forEach {
                 val lyrics = downloadTxt(it).await()
-                processLyrics(lyrics)
+                async { processLyrics(lyrics) }.await()
             }
         }
     }
@@ -40,7 +40,7 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
     }
 
 
-    private fun processLyrics(result: String) {
+    private suspend fun processLyrics(result: String) {
 
         /* Save the downloaded lyrics into a file */
         val outWriter = FileWriter(file)
@@ -49,13 +49,31 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
         outWriter.close()
 
 
+        println("Saving lyrics for $id")
         /* Save lyrics to Song object */
-        val lyrics = result.lines().map {
-            Pair(it.substring(0, 8).trim(' ').toInt(),
-                    it.substring(8).split(" ", ", "))
-        }.toMap()
 
-        songleContext.songs[id].lyrics = lyrics
+        
+
+
+
+//        val lyrics = result.lines().map { line ->
+//
+//            Pair(/*line.substring(0, 7).trim(' ', '\t').toInt()*/5,
+//                    line.substring(7)/*.split(" ", ", ")*/)
+//        }
+//        println("LMAO")
+
+//        var a = result.lines()[1]
+//        var b = a.substring(0, 7).trim(' ', '\t').toInt()
+//        println(b)
+//        var c = a.substring(7).split(" ", ", ")
+//
+//        var d = Pair(b, c)
+//        var e = listOf(d, d).toMap()
+//
+//        val lyrics = e
+        println("Lyrics are $lyrics")
+//        songleContext.songs[id].lyrics = lyrics
     }
 
     /* Downloads an XML file given URL, returns as string */
@@ -73,7 +91,7 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
         val sb = StringBuilder()
 
         /* Write out and return */
-        reader.forEachLine { sb.append(it) }
+        reader.forEachLine { sb.append(it + "\n") }
         return sb.toString()
 
     }

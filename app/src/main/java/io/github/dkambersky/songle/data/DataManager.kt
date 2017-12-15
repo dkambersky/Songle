@@ -30,33 +30,22 @@ class DataManager(private val songle: SongleApplication,
 
         DownloadXmlTask(SongsDatabaseListener(songle.context, {
             //            snackShowFinished(snackbarUpdating)
-            downloadLyrics()
+            fetchAllLyrics()
         }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
 
     }
 
-    fun downloadLyrics() {
+    private fun fetchAllLyrics() {
 
         val jobs = mutableListOf<Deferred<Int>>()
 
-        // start coroutine per thing
-        for (song in songle.context.songs)
-            jobs += async {
+        /* Fetch lyrics in parallel */
+        songle.context.songs.forEach {
+            jobs += async { fetchSongLyrics(it) }
+        }
 
-                val file = File(songle.filesDir, "${song.id()}.lyrics")
-
-                SongLyricsDownloader(
-                        songle.context,
-                        song.num,
-                        file
-                ).fetchLyrics("${songle.context.root}${song.id()}/words.txt")
-
-                song.num
-            }
-
-
-
+        /* After all lyrics are fetched, fetch maps */
         launch {
             jobs.forEach {
                 it.await()
@@ -65,6 +54,21 @@ class DataManager(private val songle: SongleApplication,
             println(" Completed downloading lyrics, going for maps")
             fetchSongMapStep()
         }
+    }
+
+    private fun fetchSongLyrics(song: Song): Int {
+
+        val file = File(songle.filesDir, "${song.id()}.lyrics")
+
+
+
+        SongLyricsDownloader(
+                songle.context,
+                song.num,
+                file
+        ).fetchLyrics("${songle.context.root}${song.id()}/words.txt")
+
+        return song.num
     }
 
 
