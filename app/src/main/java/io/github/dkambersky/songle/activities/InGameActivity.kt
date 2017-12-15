@@ -12,33 +12,37 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.Circle
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.*
 import io.github.dkambersky.songle.R
-import io.github.dkambersky.songle.data.definitions.Difficulty
-import io.github.dkambersky.songle.data.definitions.GameState
-import io.github.dkambersky.songle.data.definitions.Placemark
-import io.github.dkambersky.songle.data.definitions.Song
+import io.github.dkambersky.songle.data.definitions.*
 import kotlinx.android.synthetic.main.activity_in_game.*
+import java.util.*
+import kotlin.math.roundToInt
 
 
 class InGameActivity : MapActivity() {
 
     /* Variables */
     private lateinit var gameMap: MutableList<Placemark>
+    private lateinit var bonusMap: MutableList<Powerup>
     private lateinit var allWords: List<Placemark>
     private lateinit var collected: MutableMap<Int, MutableMap<Int, Boolean>>
     private lateinit var difficulty: Difficulty
     private lateinit var song: Song
     private lateinit var gameState: GameState
+    private val freeWordBaseNum = 50
+    private val mapUpgradeBaseNum = 25
+    private val mapBounds = listOf(55.942617, 55.946233, -3.192473, -3.184319)
     private val mapElements = mutableMapOf<String, Any>()
     private var gameShown: Boolean = false
+
+    /* Debug val */
+    private val crichton = LatLng(55.944575, -3.187129)
+
 
     /* Map functionality */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         /* UI settings */
         revievView.movementMethod = ScrollingMovementMethod()
@@ -86,34 +90,44 @@ class InGameActivity : MapActivity() {
         /* Generate the game map */
         generateMap(difficulty, song)
 
-
     }
 
+
+    /* Main update loop */
     override fun onLocationChanged(current: Location?) {
         /* Don't process null locations, wait for map's initialization */
         if (current == null || !::gameMap.isInitialized) return
-
-
-
-        map.animateCamera(CameraUpdateFactory.newLatLng(current.toLatLng()))
-
 
         /* Visualize pickup radius */
         val circle = mapElements["pickup"]
         if (circle is Circle) {
             circle.remove()
         }
-
         mapElements.put("pickup", map.addCircle(CircleOptions()
                 .radius(difficulty.pickupRange.toDouble())
                 .center(current.toLatLng())
                 .fillColor(Color.CYAN)))
 
-        /* Pick up objects in range */
+        /* Move camera */
+        map.animateCamera(CameraUpdateFactory.newLatLng(
+                current.toLatLng()
+//                crichton
+        ))
+
+
+        println("a bonus is at ${bonusMap.first().loc} with marker at ${bonusMap.first().marker!!.position}")
+        println("a marker is at ${gameMap.first().loc}")
+        println("There are ${bonusMap.size} bonuses and ${gameMap.size} markers")
+
+
+        /* Pick up placemarks in range */
         gameMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { collect(it) }
 
-        updateGameState()
 
+        /* Pick up power-ups in range */
+        bonusMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { activatePowerup(it) }
+
+        updateGameState()
 
         /* On first run, show game */
         if (!gameShown) {
@@ -131,9 +145,9 @@ class InGameActivity : MapActivity() {
 
             updateGuessCounter()
 
+            println("Showing game!")
             gameShown = true
         }
-
 
     }
 
@@ -156,6 +170,10 @@ class InGameActivity : MapActivity() {
 
         allWords = gameMap.toList()
 
+        /* Generate powerups */
+        bonusMap = mutableListOf()
+        generatePowerups()
+
 
         /* Initialize the 'collected' map */
         collected = mutableMapOf()
@@ -164,6 +182,54 @@ class InGameActivity : MapActivity() {
         }
     }
 
+    private fun generatePowerups() {
+
+        /* This used to be more complex, simplified for balance*/
+        val (numFreeWords, numMapUpgrades) = Pair(
+                (difficulty.bonusItemFactor * (freeWordBaseNum)).roundToInt(),
+                (difficulty.bonusItemFactor * (mapUpgradeBaseNum)).roundToInt())
+
+
+        val rng = Random()
+
+        songle.context.styles.put("freeWord",
+                Style("freeWord", 2.25f, hue = BitmapDescriptorFactory.HUE_AZURE))
+
+        (1..numFreeWords).forEach {
+
+            /* Get random location on map */
+            val pos = LatLng(
+                    rng.doubleBetween(mapBounds[0], mapBounds[1]),
+                    rng.doubleBetween(mapBounds[2], mapBounds[3]))
+
+            /* Create and register powerup */
+            val powerup = Powerup(pos, songle.context.styles["freeWord"] ?: Style(),
+                    powerupType = PowerupType.FREE_WORD)
+
+            bonusMap.add(powerup)
+            addMarker(powerup)
+        }
+
+
+        songle.context.styles.put("mapUpgrade",
+                Style("mapUpgrade", 2.25f, hue = BitmapDescriptorFactory.HUE_ORANGE))
+
+        (1..numMapUpgrades).forEach {
+            /* Get random location on map */
+            val pos = LatLng(
+                    rng.doubleBetween(mapBounds[0], mapBounds[1]),
+                    rng.doubleBetween(mapBounds[2], mapBounds[3]))
+
+            /* Create and register powerup */
+            val powerup = Powerup(pos, songle.context.styles["mapUpgrade"] ?:
+                    Style(), powerupType = PowerupType.MAP_UPGRADE)
+
+            bonusMap.add(powerup)
+            addMarker(powerup)
+
+        }
+
+    }
 
     private fun updateGameState() {
         /* Update review on the fly if open */
@@ -206,6 +272,25 @@ class InGameActivity : MapActivity() {
 
     }
 
+    /* Defines powerup functionality */
+    private fun activatePowerup(placemark: Powerup) {
+        println("Activated powerup $placemark")
+        bonusMap.remove(placemark)
+        placemark.marker!!.remove()
+
+
+        when (placemark.powerupType) {
+            PowerupType.FREE_WORD -> {
+                collect(gameMap[Random().nextInt(gameMap.size)])
+            }
+            PowerupType.MAP_UPGRADE -> {
+                increaseLevel()
+            }
+        }
+    }
+
+
+    /* Win conditions / game flow */
     private fun makeGuess() {
 
         val guess = nameInputField.text.toString()
@@ -289,4 +374,8 @@ class InGameActivity : MapActivity() {
     }
 
 
+    /* QoL extension functions */
+    private fun Random.doubleBetween(lower: Double, upper: Double): Double {
+        return nextDouble() * (upper - lower) + lower
+    }
 }

@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.definitions.Placemark
+import io.github.dkambersky.songle.data.definitions.Powerup
 
 /**
  * Common Map activity class.
@@ -90,6 +91,19 @@ abstract class MapActivity : BaseActivity(),
                         .icon(BitmapDescriptorFactory.fromBitmap(point.style.icon)))
     }
 
+    /* Add a powerup */
+    protected fun addMarker(point: Powerup) {
+        point.marker = map.addMarker(
+                MarkerOptions()
+                        .position(point.loc)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.defaultMarker(
+                                point.style.hue ?: BitmapDescriptorFactory.HUE_ROSE))
+                        .title(point.powerupType.label)
+        )
+
+    }
+
 
     /* QoL extension functions for Location */
     fun Location.toLatLng(): LatLng {
@@ -104,6 +118,7 @@ abstract class MapActivity : BaseActivity(),
     }
 
     fun Location.distanceTo(placemark: Placemark): Float = distanceTo(placemark.loc)
+    fun Location.distanceTo(placemark: Powerup): Float = distanceTo(placemark.loc)
 
     /* Connection related boilerplate*/
     private fun createLocationRequest() {

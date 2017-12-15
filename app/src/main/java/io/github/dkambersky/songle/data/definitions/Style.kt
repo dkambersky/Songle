@@ -6,4 +6,4 @@ import java.io.Serializable
 /**
  * Defines a style for placemarks
  */
-data class Style(val id: String = "", val iconScale: Float = -1f, val icon: Bitmap? = null) : Serializable
+data class Style(val id: String = "", val iconScale: Float = -1f, val icon: Bitmap? = null, val hue: Float? = null) : Serializable

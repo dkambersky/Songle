@@ -24,16 +24,16 @@ class GameSummaryActivity : BaseActivity() {
         t_title.text = if (state) "Victory!" else "Defeat"
 
         t_summary.text = if (state)
-            Html.fromHtml("Congratulations!<br>You guessed correctly.<br><br>The song was <br><b>${song.artist} - ${song.title}</b>.<br><br><br>" +
+            Html.fromHtml("Congratulations!<br>You guessed correctly.<br><br>The song was" +
+                    "<br><b>${song.title}</b><br>by<br><b>${song.artist}</b><br><br>" +
                     "Want to go back, or play another game?")
         else
-            Html.fromHtml("You ran out of guesses!<br>Better luck next time.<br>" +
-                    "<br><br>The song was <br><b>${song.artist} </b> -<b> ${song.title}</b>.<br><br>" +
+            Html.fromHtml("You ran out of guesses!<br>Better luck next time.<br><br>The song was" +
+                    "<br><b>${song.title}</b><br>by<br><b>${song.artist}</b><br><br>" +
                     "Want to go back, or play another game?")
 
         val color = if (state) R.color.positive else R.color.negative
         t_title.setTextColor(resources.getColor(color, theme))
     }
-
 
 }
