@@ -55,7 +55,7 @@ class InGameActivity : MapActivity() {
 
     private fun generateMap(difficulty: Difficulty, song: Song) {
         gameMap = songle.context.maps[song.num]?.
-                get(difficulty.startMapMode.toShort())!!.toMutableList()
+                get(difficulty.startMapMode)!!.toMutableList()
         gameMap.forEach { addMarker(it) }
 
     }
@@ -85,7 +85,7 @@ class InGameActivity : MapActivity() {
 
 
     private fun collect(placemark: Placemark) {
-        println("Picked up ${placemark.name}!")
+        println("Picked up ${placemark.lyricPos}!")
         placemark.marker?.remove()
         gameMap.remove(placemark)
     }

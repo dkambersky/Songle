@@ -12,12 +12,12 @@ import java.io.FileWriter
 
 /** Listens for and handles the download of the songs database */
 class SongMapListener(var context: SongleContext,
-                      private var callback: () -> Unit, private var id: Short = -1, private var level: Short = -1) : DownloadCompleteListener {
+                      private var callback: () -> Unit, private var id: Int = -1, private var level: Int = -1) : DownloadCompleteListener {
 
 
     override fun downloadComplete(result: String?) {
         /* Sanity checks for ID */
-        if (id == (-1).toShort()) return
+        if (id == -1 ) return
         if (result == null) {
             System.err.println("Map download failed! id $id, level $level")
             return

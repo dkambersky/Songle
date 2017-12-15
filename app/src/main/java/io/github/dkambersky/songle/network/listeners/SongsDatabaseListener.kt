@@ -26,7 +26,6 @@ class SongsDatabaseListener() : DownloadCompleteListener {
             return
         }
 
-
         /* Save the current db into a file */
         val outFile = File(context.context.filesDir, "songs.xml")
         val outWriter = FileWriter(outFile)
@@ -37,6 +36,7 @@ class SongsDatabaseListener() : DownloadCompleteListener {
         val songs = SongsParser(context).parse(result.byteInputStream()) ?: loadSongs()
 
         context.songs.addAll(songs)
+
 
         /* Invoke callback, if specified*/
         callback.invoke()

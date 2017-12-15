@@ -4,8 +4,9 @@ import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.SongleApplication
 import io.github.dkambersky.songle.data.definitions.Placemark
 import io.github.dkambersky.songle.data.definitions.Song
-import io.github.dkambersky.songle.network.CoroutineMapDownloader
 import io.github.dkambersky.songle.network.DownloadXmlTask
+import io.github.dkambersky.songle.network.SongLyricsDownloader
+import io.github.dkambersky.songle.network.SongMapDownloader
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
 import io.github.dkambersky.songle.storage.MapParser
 import kotlinx.coroutines.experimental.Deferred
@@ -29,13 +30,45 @@ class DataManager(private val songle: SongleApplication,
 
         DownloadXmlTask(SongsDatabaseListener(songle.context, {
             //            snackShowFinished(snackbarUpdating)
-            fetchSongStep()
+            downloadLyrics()
         }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
 
     }
 
-    private fun fetchSongStep() {
+    fun downloadLyrics() {
+
+        val jobs = mutableListOf<Deferred<Int>>()
+
+        // start coroutine per thing
+        for (song in songle.context.songs)
+            jobs += async {
+
+                val file = File(songle.filesDir, "${song.id()}.lyrics")
+
+                SongLyricsDownloader(
+                        songle.context,
+                        song.num,
+                        file
+                ).fetchLyrics("${songle.context.root}${song.id()}/words.txt")
+
+                song.num
+            }
+
+
+
+        launch {
+            jobs.forEach {
+                it.await()
+                println("Download of lyrics for $it completed")
+            }
+            println(" Completed downloading lyrics, going for maps")
+            fetchSongMapStep()
+        }
+    }
+
+
+    private fun fetchSongMapStep() {
 
         /* Get next missing song */
         val nextSong: Song
@@ -65,7 +98,7 @@ class DataManager(private val songle: SongleApplication,
                 launch {
                     println("Loading map from file $file")
                     val map = loadMap(file).await()
-                    songle.context.maps.getOrPut(nextSong.id().toShort(), { mutableMapOf() }).put(level.toShort(), map)
+                    songle.context.maps.getOrPut(nextSong.id().toInt(), { mutableMapOf() }).put(level, map)
 
                     finishMapDownload(file.canonicalPath)
                 }
@@ -79,10 +112,10 @@ class DataManager(private val songle: SongleApplication,
             downloadsInProgress.add(url)
 
             launch {
-                CoroutineMapDownloader(
+                SongMapDownloader(
                         songle.context,
                         nextSong.num,
-                        level.toShort(),
+                        level,
                         file
                 ).fetchMap(url).await()
                 finishMapDownload(url)
@@ -98,7 +131,7 @@ class DataManager(private val songle: SongleApplication,
         downloadsInProgress.remove(url)
 
         /* If all downloads for current song completed, download next song. */
-        if (downloadsInProgress.isEmpty()) fetchSongStep()
+        if (downloadsInProgress.isEmpty()) fetchSongMapStep()
 
     }
 
@@ -109,7 +142,7 @@ class DataManager(private val songle: SongleApplication,
     private fun snackShowFinished(snackbarUpdating: Snackbar) {
         snackbarUpdating.dismiss()
 
-        fetchSongStep()
+        fetchSongMapStep()
 //        b_newGame.isEnabled = true
     }
 }

@@ -86,7 +86,7 @@ abstract class MapActivity : BaseActivity(),
         point.marker = map.addMarker(
                 MarkerOptions()
                         .position(point.loc)
-                        .title(point.name)
+                        .title(point.lyricPos)
                         .icon(BitmapDescriptorFactory.fromBitmap(point.style.icon)))
     }
 

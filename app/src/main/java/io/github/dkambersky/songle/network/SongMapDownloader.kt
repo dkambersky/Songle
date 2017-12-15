@@ -14,8 +14,8 @@ import java.net.URL
 /**
  * Experimental coroutine downloadXml class
  */
-class CoroutineMapDownloader(private var songleContext: SongleContext,
-                             private var id: Short = -1, private var level: Short = -1, private val file: File) {
+class SongMapDownloader(private var songleContext: SongleContext,
+                        private var id: Int = -1, private var level: Int = -1, private val file: File) {
     fun fetchMap(vararg urls: String): Deferred<Unit> {
         return async {
             urls.forEach {
@@ -46,7 +46,7 @@ class CoroutineMapDownloader(private var songleContext: SongleContext,
 
     private fun processMapXml(result: String?) {
         /* Sanity checks for ID */
-        if (id == (-1).toShort()) return
+        if (id == -1) return
         if (result == null) {
             System.err.println("Map downloadXml failed! id $id, level $level")
             return

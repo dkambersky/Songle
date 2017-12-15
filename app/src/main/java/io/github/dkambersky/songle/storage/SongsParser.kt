@@ -120,7 +120,7 @@ class SongsParser(context: SongleContext) : BaseParser(context) {
                 else -> skip(parser)
             }
         }
-        return Song(number.toShort(), artist, title, link)
+        return Song(number.toInt(), artist, title, link, mutableMapOf())
     }
 
 

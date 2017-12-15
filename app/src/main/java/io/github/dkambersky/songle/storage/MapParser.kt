@@ -111,7 +111,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
             if (parser.eventType != XmlPullParser.START_TAG)
                 continue
             when (parser.name) {
-                "name" -> name = readByTag(parser, "name")
+                "lyricPos" -> name = readByTag(parser, "lyricPos")
                 "description" -> description = readByTag(parser, "description")
                 "styleUrl" -> style = context.styles[readByTag(parser, "styleUrl").substring(1)] ?: Style()
                 "Point" -> point = readPoint(parser)
