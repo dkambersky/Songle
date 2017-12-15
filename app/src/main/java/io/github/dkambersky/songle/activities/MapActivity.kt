@@ -86,6 +86,7 @@ abstract class MapActivity : BaseActivity(),
         point.marker = map.addMarker(
                 MarkerOptions()
                         .position(point.loc)
+                        .draggable(false)
                         .icon(BitmapDescriptorFactory.fromBitmap(point.style.icon)))
     }
 
@@ -95,7 +96,7 @@ abstract class MapActivity : BaseActivity(),
         return LatLng(latitude, longitude)
     }
 
-    fun Location.distanceTo(latLng: LatLng): Float {
+    private fun Location.distanceTo(latLng: LatLng): Float {
         val other = Location("")
         other.longitude = latLng.longitude
         other.latitude = latLng.latitude

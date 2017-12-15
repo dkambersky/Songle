@@ -35,6 +35,12 @@ class InGameActivity : MapActivity() {
         /* UI settings */
         revievView.movementMethod = ScrollingMovementMethod()
 
+        /* Hide everything except nag message until map ready*/
+        for (iChild in 0 until MainGameLayout.childCount) {
+            MainGameLayout.getChildAt(iChild).visibility = View.GONE
+        }
+        nagView.visibility = View.VISIBLE
+
         /* Load data from intent */
         difficulty = intent.extras["Difficulty"] as Difficulty
         song = intent.extras["Song"] as Song
@@ -79,7 +85,7 @@ class InGameActivity : MapActivity() {
                         this, R.raw.style_json))
 
         /* Game map look and feel */
-        map.setMaxZoomPreference(22f)
+        map.setMaxZoomPreference(18f)
         map.animateCamera(CameraUpdateFactory.zoomTo(18f))
         map.setMinZoomPreference(14f)
         map.uiSettings.isCompassEnabled = true
@@ -118,9 +124,13 @@ class InGameActivity : MapActivity() {
         }
     }
 
+    private var gameShown: Boolean = false
+
     override fun onLocationChanged(current: Location?) {
         /* Don't process null locations, wait for map's initialization */
         if (current == null || !::gameMap.isInitialized) return
+
+
 
         map.animateCamera(CameraUpdateFactory.newLatLng(current.toLatLng()))
 
@@ -140,6 +150,23 @@ class InGameActivity : MapActivity() {
         gameMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { collect(it) }
 
         updateGameState()
+
+
+        /* On first run, show game */
+        if (!gameShown) {
+
+            for (iChild in 0 until MainGameLayout.childCount) {
+                MainGameLayout.getChildAt(iChild).visibility = View.VISIBLE
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(current.toLatLng(), 18f))
+
+            /* 'Pull down the curtain' */
+            nagView.visibility = View.GONE
+            revievView.visibility = View.GONE
+
+            gameShown = true
+        }
+
 
     }
 
@@ -167,8 +194,6 @@ class InGameActivity : MapActivity() {
                                 (mapState.pickedUpPlacemarks / mapState.step))).toFloat() /
                         mapState.currentThreshold.toFloat()) * 100).toInt()
 
-
-        println("Updated state, major: ${progressBarMajor.progress}")
 
     }
 

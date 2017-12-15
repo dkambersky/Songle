@@ -1,7 +1,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/MainLayout"
+    android:id="@+id/MainGameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -102,7 +102,6 @@
         android:layout_marginTop="8dp"
         android:clickable="true"
         android:scrollbars="vertical"
-        android:text="TextView"
         android:textColor="@color/white"
         android:textColorHighlight="@color/colorBackground"
         android:textSize="20sp"
@@ -114,4 +113,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/map" />
 
+    <TextView
+        android:id="@+id/nagView"
+        android:layout_width="484dp"
+        android:layout_height="678dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:scrollbars="vertical"
+        android:text="Waiting for location..."
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textColorHighlight="@color/colorBackground"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/map" />
+
 </android.support.constraint.ConstraintLayout>
+
