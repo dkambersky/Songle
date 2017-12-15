@@ -65,5 +65,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+    fun toggleVisibility(view: View) {
+        view.visibility = if (view.visibility == View.GONE) View.VISIBLE else View.GONE
+    }
 
 }

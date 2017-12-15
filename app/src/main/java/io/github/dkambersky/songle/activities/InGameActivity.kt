@@ -1,10 +1,15 @@
 package io.github.dkambersky.songle.activities
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
@@ -24,7 +29,7 @@ class InGameActivity : MapActivity() {
     private lateinit var collected: MutableMap<Int, MutableMap<Int, Boolean>>
     private lateinit var difficulty: Difficulty
     private lateinit var song: Song
-    private lateinit var mapState: GameState
+    private lateinit var gameState: GameState
     private val mapElements = mutableMapOf<String, Any>()
 
 
@@ -46,11 +51,57 @@ class InGameActivity : MapActivity() {
         song = intent.extras["Song"] as Song
 
         /* Register listeners */
-        b_view_progress.setOnClickListener { updateReview(); toggleReview() }
-        b_guess.setOnClickListener { }
-
+        b_view_progress.setOnClickListener { updateReview(); toggleVisibility(revievView) }
+        b_guess.setOnClickListener { toggleVisibility(nameInputField); toggleVisibility(t_guessInfo) }
+        nameInputField.setOnKeyListener { _, keycode, event -> handleInput(keycode, event) }
 
     }
+
+    private fun handleInput(keyCode: Int, event: KeyEvent): Boolean {
+        if ((event.action == KeyEvent.ACTION_DOWN) &&
+                (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            makeGuess()
+            return true
+        }
+        return false
+    }
+
+    private fun makeGuess() {
+
+        val guess = nameInputField.text.toString()
+
+        /* Clean up */
+        nameInputField.setText("")
+        toggleVisibility(nameInputField)
+        toggleVisibility(t_guessInfo)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                .hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        nameInputField.clearFocus()
+
+
+        /* Guess */
+        if (guess.equals(song.title, ignoreCase = true)) {
+            println("User won!")
+        } else {
+            println("user guessed incorrectly.")
+            if (gameState.guessesLeft > 0) {
+                gameState.guessesLeft--
+                if (gameState.guessesLeft == 0) {
+                    println("User has lost!")
+                }
+            }
+        }
+
+        /* Update guess counter */
+        updateGuessCounter()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateGuessCounter() {
+        t_guessInfo.text = "Guesses left: ${if (gameState.guessesLeft == -1) "∞" else gameState.guessesLeft.toString()}"
+    }
+
 
     private fun updateReview() {
         val builder = StringBuilder()
@@ -72,9 +123,6 @@ class InGameActivity : MapActivity() {
         revievView.text = builder.toString()
     }
 
-    private fun toggleReview() {
-        revievView.visibility = if (revievView.visibility == View.GONE) View.VISIBLE else View.GONE
-    }
 
     override fun onMapReady(googleMap: GoogleMap) {
         super.onMapReady(googleMap)
@@ -105,12 +153,13 @@ class InGameActivity : MapActivity() {
                 get(difficulty.startMapMode)!!.toMutableList()
         gameMap.forEach { addMarker(it) }
 
-        mapState = GameState(
+        gameState = GameState(
                 gameMap.size,
                 difficulty.startMapMode,
                 0,
                 gameMap.size.div(5 - difficulty.startMapMode),
-                gameMap.size.div(5 - difficulty.startMapMode)
+                gameMap.size.div(5 - difficulty.startMapMode),
+                difficulty.guessAttempts
         )
 
 
@@ -163,6 +212,10 @@ class InGameActivity : MapActivity() {
             /* 'Pull down the curtain' */
             nagView.visibility = View.GONE
             revievView.visibility = View.GONE
+            nameInputField.visibility = View.GONE
+            t_guessInfo.visibility = View.GONE
+
+            updateGuessCounter()
 
             gameShown = true
         }
@@ -178,21 +231,21 @@ class InGameActivity : MapActivity() {
 
 
         /* Resolve map level upgrade */
-        if (mapState.currentThreshold == mapState.pickedUpPlacemarks) {
+        if (gameState.currentThreshold == gameState.pickedUpPlacemarks) {
             increaseLevel()
-            mapState.currentThreshold = mapState.pickedUpPlacemarks
+            gameState.currentThreshold = gameState.pickedUpPlacemarks
         }
 
         /* Update progress bars */
         progressBarMajor.progress =
-                ((mapState.pickedUpPlacemarks.toFloat() /
-                        mapState.maxPlacemarks.toFloat()) * 100).toInt()
+                ((gameState.pickedUpPlacemarks.toFloat() /
+                        gameState.maxPlacemarks.toFloat()) * 100).toInt()
 
         progressBarMinor.progress =
-                (((mapState.pickedUpPlacemarks -
-                        (mapState.step *
-                                (mapState.pickedUpPlacemarks / mapState.step))).toFloat() /
-                        mapState.currentThreshold.toFloat()) * 100).toInt()
+                (((gameState.pickedUpPlacemarks -
+                        (gameState.step *
+                                (gameState.pickedUpPlacemarks / gameState.step))).toFloat() /
+                        gameState.currentThreshold.toFloat()) * 100).toInt()
 
 
     }
@@ -207,7 +260,7 @@ class InGameActivity : MapActivity() {
         gameMap.remove(placemark)
 
         collected[placemark.lyricPos.first]!!.put(placemark.lyricPos.second, true)
-        mapState.pickedUpPlacemarks++
+        gameState.pickedUpPlacemarks++
 
     }
 

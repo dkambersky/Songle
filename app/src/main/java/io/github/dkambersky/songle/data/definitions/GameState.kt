@@ -7,5 +7,6 @@ data class GameState(val maxPlacemarks: Int,
                      var currentLevel: Int,
                      var pickedUpPlacemarks: Int,
                      var currentThreshold: Int,
-                     val step: Int
+                     val step: Int,
+                     var guessesLeft: Int
 )
