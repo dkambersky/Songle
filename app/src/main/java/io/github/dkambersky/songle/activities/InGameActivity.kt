@@ -10,14 +10,17 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.definitions.Difficulty
+import io.github.dkambersky.songle.data.definitions.GameState
 import io.github.dkambersky.songle.data.definitions.Placemark
 import io.github.dkambersky.songle.data.definitions.Song
+import kotlinx.android.synthetic.main.activity_in_game.*
 
 
 class InGameActivity : MapActivity() {
     private lateinit var gameMap: MutableList<Placemark>
     private lateinit var difficulty: Difficulty
     private lateinit var song: Song
+    private lateinit var mapState: GameState
     private val mapElements = mutableMapOf<String, Any>()
 
 
@@ -27,6 +30,12 @@ class InGameActivity : MapActivity() {
         /* Load data from intent */
         difficulty = intent.extras["Difficulty"] as Difficulty
         song = intent.extras["Song"] as Song
+
+        /* Register listeners */
+        b_view_progress.setOnClickListener { transition(GameProgressActivity::class.java) }
+        b_guess.setOnClickListener { transition(GameProgressActivity::class.java) }
+
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -36,7 +45,6 @@ class InGameActivity : MapActivity() {
         map.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
                         this, R.raw.style_json))
-
 
         /* Game map look and feel */
         map.setMaxZoomPreference(22f)
@@ -58,6 +66,14 @@ class InGameActivity : MapActivity() {
                 get(difficulty.startMapMode)!!.toMutableList()
         gameMap.forEach { addMarker(it) }
 
+        mapState = GameState(
+                gameMap.size,
+                difficulty.startMapMode,
+                0,
+                gameMap.size.div(5 - difficulty.startMapMode),
+                gameMap.size.div(5 - difficulty.startMapMode)
+        )
+
     }
 
     override fun onLocationChanged(current: Location?) {
@@ -78,16 +94,45 @@ class InGameActivity : MapActivity() {
                 .center(current.toLatLng())
                 .fillColor(Color.CYAN)))
 
-
         gameMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { collect(it) }
+        updateGameState()
 
     }
 
+    private fun updateGameState() {
+        /* Resolve map level upgrade */
+        if (mapState.currentThreshold == mapState.pickedUpPlacemarks) {
+            increaseLevel()
+            mapState.currentThreshold = mapState.pickedUpPlacemarks
+        }
+
+        /* Update progress bars */
+        progressBarMajor.progress =
+                ((mapState.pickedUpPlacemarks.toFloat() /
+                        mapState.maxPlacemarks.toFloat()) * 100).toInt()
+
+        progressBarMinor.progress =
+                (((mapState.pickedUpPlacemarks -
+                        (mapState.step *
+                                (mapState.pickedUpPlacemarks / mapState.step))).toFloat() /
+                        mapState.currentThreshold.toFloat()) * 100).toInt()
+
+
+        println("Updated state, major: ${progressBarMajor.progress}")
+
+    }
+
+    private fun increaseLevel() {
+        println("Increasing level!")
+    }
 
     private fun collect(placemark: Placemark) {
-        println("Picked up ${placemark.lyricPos}!")
+        println("Picked up ${placemark.lyricPos}, ${placemark.text(song.lyrics)}!")
         placemark.marker?.remove()
         gameMap.remove(placemark)
+
+        mapState.pickedUpPlacemarks++
+
     }
 
 }

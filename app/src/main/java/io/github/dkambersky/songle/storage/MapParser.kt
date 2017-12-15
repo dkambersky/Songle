@@ -103,7 +103,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
     @Throws(XmlPullParserException::class, IOException::class)
     private fun readPlacemark(parser: XmlPullParser): Placemark {
         parser.require(XmlPullParser.START_TAG, ns, "Placemark")
-        var name = ""
+        var lyricPos = Pair(-1, -1)
         var description = ""
         var style = Style()
         var point = LatLng(0.0, 0.0)
@@ -111,14 +111,20 @@ class MapParser(context: SongleContext) : BaseParser(context) {
             if (parser.eventType != XmlPullParser.START_TAG)
                 continue
             when (parser.name) {
-                "lyricPos" -> name = readByTag(parser, "lyricPos")
+                "name" -> lyricPos = readLyricPos(parser)
                 "description" -> description = readByTag(parser, "description")
                 "styleUrl" -> style = context.styles[readByTag(parser, "styleUrl").substring(1)] ?: Style()
                 "Point" -> point = readPoint(parser)
                 else -> skip(parser)
             }
         }
-        return Placemark(name, description, style, point)
+        return Placemark(lyricPos, description, style, point)
+    }
+
+
+    private fun readLyricPos(parser: XmlPullParser): Pair<Int, Int> {
+        val ints = readByTag(parser, "name").split(":").map { it.toInt() }
+        return Pair(ints[0], ints[1])
     }
 
     private fun readPoint(parser: XmlPullParser): LatLng {

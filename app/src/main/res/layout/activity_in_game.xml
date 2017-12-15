@@ -26,7 +26,7 @@
         tools:context="io.github.dkambersky.songle.activities.InGameActivity" />
 
     <Button
-        android:id="@+id/b_overview"
+        android:id="@+id/b_guess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -34,15 +34,15 @@
         android:elevation="0dp"
         android:text="Make a Guess"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/b_overview2"
-        app:layout_constraintEnd_toEndOf="@+id/b_overview2"
+        app:layout_constraintBottom_toTopOf="@+id/b_view_progress"
+        app:layout_constraintEnd_toEndOf="@+id/b_view_progress"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/b_overview2"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar4"
+        app:layout_constraintStart_toStartOf="@+id/b_view_progress"
+        app:layout_constraintTop_toBottomOf="@+id/progressBarMinor"
         app:layout_constraintVertical_bias="0.997" />
 
     <Button
-        android:id="@+id/b_overview2"
+        android:id="@+id/b_view_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -56,7 +56,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline" />
 
     <ProgressBar
-        android:id="@+id/progressBar4"
+        android:id="@+id/progressBarMinor"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="298dp"
         android:layout_height="42dp"
@@ -72,7 +72,7 @@
         app:layout_constraintVertical_bias="0.84" />
 
     <ProgressBar
-        android:id="@+id/progressBar5"
+        android:id="@+id/progressBarMajor"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="298dp"
         android:layout_height="42dp"

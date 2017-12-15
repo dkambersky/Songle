@@ -95,6 +95,7 @@ class DataManager(private val songle: SongleApplication,
         )
 
         println("Fetching song ${nextSong.id()}: ${nextSong.title}")
+
         /* Download the levels in parallel */
         for (level in 1..5) {
             val file = files[level - 1]

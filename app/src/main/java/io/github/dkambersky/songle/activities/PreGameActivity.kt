@@ -59,7 +59,7 @@ class PreGameActivity : BaseActivity() {
                         Map starts at level <b>${difficulty.startMapMode}</b>.<br>
                         Pick-up radius: <b>${difficulty.pickupRange}</b><br>
                         Bonus item factor: <b>${difficulty.bonusItemFactor}</b><br>
-                        # of guesses: <b>${if (difficulty.guessAttempts > 0) difficulty.guessAttempts else "Unlimited"}</b>""")
+                        # of guesses: <b>${if (difficulty.guessAttempts > 0) "" + difficulty.guessAttempts else "Unlimited"}</b>""")
 
 
         /* Change button appearance */

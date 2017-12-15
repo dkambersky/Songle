@@ -8,10 +8,14 @@ import java.io.Serializable
 /**
  * Defines a single Placemark on the map
  */
-data class Placemark(val lyricPos: String,
+data class Placemark(val lyricPos: Pair<Int, Int>,
                      val description: String,
                      val style: Style,
                      val loc: LatLng,
-                     var marker: Marker? = null,
-                     var text: String = "[missing]") : Serializable
+                     var marker: Marker? = null) : Serializable {
+
+    fun text(lyrics: Map<Int, List<String>>): String {
+        return lyrics[lyricPos.first]!![lyricPos.second - 1]
+    }
+}
 
