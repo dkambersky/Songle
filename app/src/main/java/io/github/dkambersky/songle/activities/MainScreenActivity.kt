@@ -40,24 +40,18 @@ class MainScreenActivity : BaseActivity() {
         initialize()
     }
 
-
     private fun initialize() {
         snackbarAlert = snack("Hang tight! Checking for updates.", Snackbar.LENGTH_INDEFINITE)
+
         /* Launch non-blocking init co-routine */
-        runOnUiThread {
-            launch(UI) {
-                async(UI) {
-                    songle.data.initialize()
-                }.await()
-                println("Loading data finished.")
-                snackbarAlert.dismiss()
-                b_exit.isEnabled = true
-
-
-            }
-
+        launch(UI) {
+            async(UI) {
+                songle.data.initialize()
+            }.await()
+            println("Loading data finished.")
+            snackbarAlert.dismiss()
+            b_exit.isEnabled = true
         }
     }
-
 
 }
