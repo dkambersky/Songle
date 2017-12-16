@@ -30,16 +30,13 @@ abstract class MapActivity : BaseActivity(),
         com.google.android.gms.location.LocationListener {
 
     protected lateinit var map: GoogleMap
-    protected lateinit var apiClient: GoogleApiClient
-    protected var lastLocation: Location? = null
-
+    private lateinit var apiClient: GoogleApiClient
+    private var lastLocation: Location? = null
     private val locPermissionNum: Int = 5
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_in_game)
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -51,15 +48,12 @@ abstract class MapActivity : BaseActivity(),
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build()
-
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         initLocServices()
     }
-
 
     /* Add a placemark*/
     protected fun addMarker(point: Placemark) {
@@ -80,7 +74,6 @@ abstract class MapActivity : BaseActivity(),
 
     }
 
-
     /* Add a powerup */
     protected fun addMarker(point: Powerup) {
         point.marker = map.addMarker(
@@ -94,19 +87,16 @@ abstract class MapActivity : BaseActivity(),
 
     }
 
-
     /* QoL extension functions for Location */
     fun Location.toLatLng(): LatLng {
         return LatLng(latitude, longitude)
     }
-
     fun Location.distanceTo(latLng: LatLng): Float {
         val other = Location("")
         other.longitude = latLng.longitude
         other.latitude = latLng.latitude
         return distanceTo(other)
     }
-
     fun Location.distanceTo(placemark: Placemark): Float = distanceTo(placemark.loc)
     fun Location.distanceTo(placemark: Powerup): Float = distanceTo(placemark.loc)
 
@@ -170,7 +160,6 @@ abstract class MapActivity : BaseActivity(),
         }
     }
 
-
     /* Try requesting permissions */
     private fun initLocServices() {
         try {
@@ -180,9 +169,7 @@ abstract class MapActivity : BaseActivity(),
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), locPermissionNum)
         }
-
     }
-
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {

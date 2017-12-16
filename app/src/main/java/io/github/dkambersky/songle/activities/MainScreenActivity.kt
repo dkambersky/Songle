@@ -16,7 +16,6 @@ import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.util.*
 
-
 class MainScreenActivity : BaseActivity() {
     private lateinit var snackbarAlert: Snackbar
     private var registered = false
@@ -41,15 +40,13 @@ class MainScreenActivity : BaseActivity() {
         if (!songle.inited)
             initialize()
 
-
     }
 
     override fun onResume() {
         super.onResume()
-        println("Second chance check")
+
         /* Give the user another chance on first run */
         if (!File(filesDir, "songs.xml").exists()) {
-            println("Second chance")
             initialize()
         }
     }
@@ -73,18 +70,15 @@ class MainScreenActivity : BaseActivity() {
             async(UI) {
                 songle.data.initialize()
             }.await()
-            println("Loading data finished.")
             snackbarAlert.dismiss()
             b_exit.isEnabled = true
             songle.inited = true
         }
     }
 
-
     private fun firstRunCheck(): Boolean {
         val mobileEnabled = PreferenceManager.getDefaultSharedPreferences(songle)
                 .getBoolean("mobileEnabled", false)
-
 
         return !File(filesDir, "songs.xml").exists() && !mobileEnabled
     }
@@ -95,7 +89,7 @@ class MainScreenActivity : BaseActivity() {
                     " - either connect to Wi-Fi, or enable Mobile Data in the settings. Have fun!", 20000)
 
             val textView = bar.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
-            textView.maxLines = 3
+            textView.   maxLines = 3
         }
     }
 
@@ -104,4 +98,3 @@ class MainScreenActivity : BaseActivity() {
         unregisterReceiver(songle.data)
     }
 }
-

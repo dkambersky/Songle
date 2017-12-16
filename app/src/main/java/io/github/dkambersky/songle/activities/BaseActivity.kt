@@ -81,9 +81,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
-
     fun showSnackbar(message: Spanned, length: Int = Snackbar.LENGTH_LONG): Snackbar {
-
         val rootView = this.window.decorView.findViewById<View>(android.R.id.content)
         val bar = Snackbar.make(rootView, message, length)
 
@@ -91,7 +89,6 @@ abstract class BaseActivity : AppCompatActivity() {
         return bar
 
     }
-
 
     fun toggleVisibility(view: View) {
         view.visibility = if (view.visibility == View.GONE) View.VISIBLE else View.GONE

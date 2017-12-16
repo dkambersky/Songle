@@ -208,7 +208,6 @@ class InGameActivity : MapActivity() {
         bonusMap = mutableListOf()
         generatePowerups()
 
-
         gameMap.forEach {
             val entry = collected.getOrPut(it.lyricPos.first, { mutableMapOf() })
             if (!entry.contains(it.lyricPos.second)) {
@@ -398,7 +397,6 @@ class InGameActivity : MapActivity() {
 
     private fun updateHintView() {
         val builder = StringBuilder()
-
         for (iLine in 0 until song.lyrics.size) {
             val line = song.lyrics[iLine] ?: continue
             for (iWord in 0 until line.size) {

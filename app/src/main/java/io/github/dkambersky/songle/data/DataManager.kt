@@ -33,7 +33,6 @@ class DataManager(private val songle: SongleApplication,
 
 
     suspend fun initialize() {
-        println("Initialize data starting")
         if (!inited) {
             updateAndLoad()
             async {
@@ -81,24 +80,19 @@ class DataManager(private val songle: SongleApplication,
     }
 
     private fun fetchAllLyrics() {
-        println("Starting lyrics download, songs has ${songle.context.songs.size} entries")
-
         val jobs = mutableListOf<Deferred<Int>>()
 
         /* Fetch lyrics in parallel */
         songle.context.songs.forEach {
-            println("Trying to download $it")
             try {
                 jobs += async {
                     fetchSongLyrics(it)
                 }
-                println("I guess")
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            println("Lmao")
         }
-        println("Nope")
+
         jobs.forEach { print("$it, ${it.isActive}, ${it.isCompletedExceptionally}, ${it.isCancelled}") }
 
         /* After all lyrics are fetched, fetch maps */
@@ -106,13 +100,11 @@ class DataManager(private val songle: SongleApplication,
             jobs.forEach {
                 it.await()
             }
-            println("Completed downloading lyrics, going for maps")
             fetchSongMapStep()
         }
     }
 
     private suspend fun fetchSongLyrics(song: Song): Int {
-        println("Fetch")
         val file = File(songle.filesDir, "${song.id()}.lyrics")
 
         if (file.isFile) {
@@ -121,7 +113,6 @@ class DataManager(private val songle: SongleApplication,
             return song.num
         }
 
-        println("Spawning lyrics downloader for $song")
         SongLyricsDownloader(
                 songle.context,
                 song.num,
@@ -134,7 +125,7 @@ class DataManager(private val songle: SongleApplication,
 
     private fun fetchSongMapStep() {
         val offline = connection == ConnectionType.OFFLINE || connection == ConnectionType.UNKNOWN
-        println("Downloading offline? $offline")
+        println("Got internet access? ${!offline}")
 
         /* Get next missing song */
         val nextSong: Song
