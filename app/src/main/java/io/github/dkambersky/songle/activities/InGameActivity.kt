@@ -2,9 +2,9 @@ package io.github.dkambersky.songle.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.text.Html
 import android.text.method.ScrollingMovementMethod
 import android.view.KeyEvent
 import android.view.View
@@ -22,22 +22,22 @@ import kotlin.math.roundToInt
 
 class InGameActivity : MapActivity() {
 
-    /* Variables */
+    /* Constants*/
+    private val freeWordBaseNum = 40
+    private val mapUpgradeBaseNum = 15
+    private val wordsToUpgrade = 30
+    private val mapBounds = listOf(55.942617, 55.946233, -3.192473, -3.184319)
+
+    /* State */
     private lateinit var gameMap: MutableList<Placemark>
     private lateinit var bonusMap: MutableList<Powerup>
     private lateinit var allWords: List<Placemark>
-    private lateinit var collected: MutableMap<Int, MutableMap<Int, Boolean>>
     private lateinit var difficulty: Difficulty
     private lateinit var song: Song
     private lateinit var gameState: GameState
-    private val freeWordBaseNum = 50
-    private val mapUpgradeBaseNum = 25
-    private val mapBounds = listOf(55.942617, 55.946233, -3.192473, -3.184319)
+    private var collected: MutableMap<Int, MutableMap<Int, Boolean>> = mutableMapOf()
     private val mapElements = mutableMapOf<String, Any>()
     private var gameShown: Boolean = false
-
-    /* Debug val */
-    private val crichton = LatLng(55.944575, -3.187129)
 
 
     /* Map functionality */
@@ -46,6 +46,8 @@ class InGameActivity : MapActivity() {
 
         /* UI settings */
         revievView.movementMethod = ScrollingMovementMethod()
+        progressBarMajor.scaleY = 3f
+        progressBarMinor.scaleY = 3f
 
         /* Hide everything except nag message until map ready*/
         for (iChild in 0 until MainGameLayout.childCount) {
@@ -88,7 +90,7 @@ class InGameActivity : MapActivity() {
 
 
         /* Generate the game map */
-        generateMap(difficulty, song)
+        generateMap()
 
     }
 
@@ -103,22 +105,22 @@ class InGameActivity : MapActivity() {
         if (circle is Circle) {
             circle.remove()
         }
-        mapElements.put("pickup", map.addCircle(CircleOptions()
-                .radius(difficulty.pickupRange.toDouble())
-                .center(current.toLatLng())
-                .fillColor(Color.CYAN)))
+        mapElements.put("pickup",
+                map.addCircle(CircleOptions()
+                        .radius(difficulty.pickupRange.toDouble())
+                        .center(current.toLatLng())
+                        .fillColor(resources.getColor(R.color.primarySubtle, theme))
+                        .strokeWidth(10f)
+                        .strokeColor(resources.getColor(R.color.secondarySubtle, theme))
+                )
+        )
 
         /* Move camera */
-        map.animateCamera(CameraUpdateFactory.newLatLng(
-                current.toLatLng()
-//                crichton
-        ))
-
-
-        println("a bonus is at ${bonusMap.first().loc} with marker at ${bonusMap.first().marker!!.position}")
-        println("a marker is at ${gameMap.first().loc}")
-        println("There are ${bonusMap.size} bonuses and ${gameMap.size} markers")
-
+        map.animateCamera(
+                CameraUpdateFactory.newLatLng(
+                        current.toLatLng()
+                )
+        )
 
         /* Pick up placemarks in range */
         gameMap.filter { current.distanceTo(it) < difficulty.pickupRange }.forEach { collect(it) }
@@ -153,20 +155,49 @@ class InGameActivity : MapActivity() {
 
 
     /* Game functionality */
-    private fun generateMap(difficulty: Difficulty, song: Song) {
+    private fun upgradeMapToLevel(level: Int) {
+        if (level > 5) return
+        snack(Html.fromHtml("Map level increasing to <b>$level</b>"), length = 4000)
+        println("Upgrading map to level $level!")
+
+        /* Clean up */
+        gameMap.forEach { it.marker?.remove() }
+        bonusMap.forEach { it.marker?.remove() }
+
+        /* Save progress */
+        gameState.currentFloor = gameState.pickedUpPlacemarks
+        gameState.currentThreshold = gameState.currentFloor + gameState.step
+        gameState.pickedUpPlacemarks = 0
+        gameState.currentLevel++
+
+        /* Generate new map */
+        generateMap(level)
+    }
+
+
+    private fun generateMap(level: Int = -1) {
+        val realLevel = if (level == -1) difficulty.startMapMode else level
+
         gameMap = songle.context.maps[song.num]?.
-                get(difficulty.startMapMode)!!.toMutableList()
+                get(realLevel)!!.toMutableList()
         gameMap.forEach { addMarker(it) }
 
-        gameState = GameState(
-                gameMap.size,
-                difficulty.startMapMode,
-                0,
-                gameMap.size.div(5 - difficulty.startMapMode),
-                gameMap.size.div(5 - difficulty.startMapMode),
-                difficulty.guessAttempts
-        )
 
+        /* Initialize state - runs only once*/
+        if (!::gameState.isInitialized) {
+            gameState = GameState(
+                    gameMap.size,
+                    difficulty.startMapMode,
+                    0,
+                    wordsToUpgrade,
+                    wordsToUpgrade,
+                    difficulty.guessAttempts,
+                    0
+            )
+        }
+
+        /* Update current max */
+        gameState.maxPlacemarks = gameMap.size
 
         allWords = gameMap.toList()
 
@@ -175,11 +206,13 @@ class InGameActivity : MapActivity() {
         generatePowerups()
 
 
-        /* Initialize the 'collected' map */
-        collected = mutableMapOf()
         gameMap.forEach {
-            collected.getOrPut(it.lyricPos.first, { mutableMapOf() }).put(it.lyricPos.second, false)
+            val entry = collected.getOrPut(it.lyricPos.first, { mutableMapOf() })
+            if (!entry.contains(it.lyricPos.second)) {
+                entry.put(it.lyricPos.second, false)
+            }
         }
+
     }
 
     private fun generatePowerups() {
@@ -240,30 +273,23 @@ class InGameActivity : MapActivity() {
 
         /* Resolve map level upgrade */
         if (gameState.currentThreshold == gameState.pickedUpPlacemarks) {
-            increaseLevel()
-            gameState.currentThreshold = gameState.pickedUpPlacemarks
+            upgradeMapToLevel(gameState.currentLevel + 1)
         }
 
         /* Update progress bars */
         progressBarMajor.progress =
-                ((gameState.pickedUpPlacemarks.toFloat() /
-                        gameState.maxPlacemarks.toFloat()) * 100).toInt()
+                (((gameState.currentFloor + gameState.pickedUpPlacemarks).toFloat() /
+                        gameState.maxPlacemarks.toFloat()) * 100).roundToInt()
+
 
         progressBarMinor.progress =
-                (((gameState.pickedUpPlacemarks -
-                        (gameState.step *
-                                (gameState.pickedUpPlacemarks / gameState.step))).toFloat() /
-                        gameState.currentThreshold.toFloat()) * 100).toInt()
-
+                (((gameState.pickedUpPlacemarks).toFloat() / (gameState.step).toFloat()) * 100).roundToInt()
 
     }
 
-    private fun increaseLevel() {
-        println("Increasing level!")
-    }
 
     private fun collect(placemark: Placemark) {
-        println("Picked up ${placemark.lyricPos}, ${placemark.text(song.lyrics)}!")
+        snack(Html.fromHtml("Collected '<b>${placemark.text(song.lyrics)}</b>'"))
         placemark.marker?.remove()
         gameMap.remove(placemark)
 
@@ -273,18 +299,24 @@ class InGameActivity : MapActivity() {
     }
 
     /* Defines powerup functionality */
-    private fun activatePowerup(placemark: Powerup) {
-        println("Activated powerup $placemark")
-        bonusMap.remove(placemark)
-        placemark.marker!!.remove()
+    private fun activatePowerup(powerup: Powerup) {
+        bonusMap.remove(powerup)
+        powerup.marker!!.remove()
 
 
-        when (placemark.powerupType) {
+        when (powerup.powerupType) {
             PowerupType.FREE_WORD -> {
-                collect(gameMap[Random().nextInt(gameMap.size)])
+                val candidates =
+                        if (gameState.currentLevel == 1)
+                            gameMap
+                        else
+                            gameMap.filter { it.description != "boring" }
+
+                collect(candidates[Random().nextInt(candidates.size)])
+
             }
             PowerupType.MAP_UPGRADE -> {
-                increaseLevel()
+                upgradeMapToLevel(gameState.currentLevel + 1)
             }
         }
     }
@@ -306,6 +338,11 @@ class InGameActivity : MapActivity() {
 
 
         /* Guess */
+
+        /* Ignore empty guess, assume intent to close */
+        if (guess == "") return
+
+
         if (guess.equals(song.title, ignoreCase = true)) {
             endGameVictory()
         } else {
@@ -351,6 +388,9 @@ class InGameActivity : MapActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateGuessCounter() {
         t_guessInfo.text = "Guesses left: ${if (gameState.guessesLeft == -1) "∞" else gameState.guessesLeft.toString()}"
+        if (gameState.guessesLeft != -1) {
+            snack(Html.fromHtml("Guesses left: <b>${gameState.guessesLeft}</b>"))
+        }
     }
 
     private fun updateHintView() {
