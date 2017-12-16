@@ -17,15 +17,17 @@
     <!-- About -->
     <string name="about_MainContent">
         <b>Hi!</b>
-        \n This is an About page.\n\n
+        \n This is Songle\'s About page.\n\n
         <b>How to play:</b>\n
-        Walk around collecting words. When you have enough, try guessing the song they\'re from!\n\n\n
+        Walk around collecting words. When you have enough, try guessing the song they\'re from!\n\n
+        The orange bar at the top shows your progress towards collecting <i>all</i> currently available words.\n
+        The blue bar below it shows your progress towards upgrading the map to a higher level.\n\n
+        Map levels are important: They affect both how many words you can collect, and whether they are helpfully labeled.
+        \n\n
         <b>Changelog:</b>\n
         -----\n\n
         <b>Contact:</b>\n
-            WIP\n\n
-        <b>Attributions:</b>\n
-            WIP\n
+            github.com/dkambersky\n\n
     </string>
 
 
