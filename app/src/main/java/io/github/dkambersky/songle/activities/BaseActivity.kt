@@ -32,8 +32,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
         /* Enter / keep fullscreen */
         if (PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean("fullscreen", true)) {
+                .getDefaultSharedPreferences(songle)
+                .getBoolean("defaultDifficulty", true)) {
             enterFullscreen()
         }
 

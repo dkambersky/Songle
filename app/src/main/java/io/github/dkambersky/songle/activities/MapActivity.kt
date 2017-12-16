@@ -84,12 +84,23 @@ abstract class MapActivity : BaseActivity(),
 
     /* Add a placemark*/
     protected fun addMarker(point: Placemark) {
-        point.marker = map.addMarker(
-                MarkerOptions()
-                        .position(point.loc)
-                        .draggable(false)
-                        .icon(BitmapDescriptorFactory.fromBitmap(point.style.icon)))
+        if (point.style.icon != null) {
+            point.marker = map.addMarker(
+                    MarkerOptions()
+                            .position(point.loc)
+                            .draggable(false)
+                            .icon(BitmapDescriptorFactory.fromBitmap(point.style.icon)))
+        } else {
+            point.marker = map.addMarker(
+                    MarkerOptions()
+                            .position(point.loc)
+                            .draggable(false)
+                            .icon(BitmapDescriptorFactory.defaultMarker(
+                                    point.style.hue ?: BitmapDescriptorFactory.HUE_ROSE)))
+        }
+
     }
+
 
     /* Add a powerup */
     protected fun addMarker(point: Powerup) {

@@ -1,5 +1,7 @@
 package io.github.dkambersky.songle.activities
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
@@ -14,6 +16,7 @@ import java.util.*
 
 class MainScreenActivity : BaseActivity() {
     private lateinit var snackbarAlert: Snackbar
+    private var registered = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +26,6 @@ class MainScreenActivity : BaseActivity() {
         if (!songle.inited) {
             songle.context = SongleContext(mutableListOf(), Collections.synchronizedMap(mutableMapOf()), Collections.synchronizedMap(mutableMapOf()), applicationContext, mutableSetOf(), "")
             songle.data = DataManager(songle)
-            songle.inited = true
         }
 
 
@@ -37,11 +39,21 @@ class MainScreenActivity : BaseActivity() {
         b_exit.isEnabled = false
 
         /* Load data */
-        initialize()
+        if (!songle.inited)
+            initialize()
     }
 
     private fun initialize() {
         snackbarAlert = snack("Hang tight! Checking for updates.", Snackbar.LENGTH_INDEFINITE)
+
+        /* Register DataManager for connection tracking */
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+
+        if (!registered) {
+
+            this.registerReceiver(songle.data, filter)
+            registered = true
+        }
 
         /* Launch non-blocking init co-routine */
         launch(UI) {
@@ -51,7 +63,14 @@ class MainScreenActivity : BaseActivity() {
             println("Loading data finished.")
             snackbarAlert.dismiss()
             b_exit.isEnabled = true
+            songle.inited = true
         }
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(songle.data)
+    }
 }
+

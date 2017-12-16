@@ -1,7 +1,9 @@
 package io.github.dkambersky.songle.storage
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Xml
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import io.github.dkambersky.songle.data.definitions.Placemark
 import io.github.dkambersky.songle.data.definitions.SongleContext
@@ -18,7 +20,7 @@ import java.net.URL
 /**
  * Parses a single Map KML file for a song.
  */
-class MapParser(context: SongleContext) : BaseParser(context) {
+class MapParser(context: SongleContext, val skipStyles: Boolean = false) : BaseParser(context) {
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(input: InputStream): List<Placemark> {
@@ -88,7 +90,13 @@ class MapParser(context: SongleContext) : BaseParser(context) {
 
 
         /* Fetch & build style */
-        val image = BitmapFactory.decodeStream(URL(iconUrl).content as InputStream)
+        var image: Bitmap? = null
+        var hue: Float? = null
+        if (skipStyles) {
+            hue = BitmapDescriptorFactory.HUE_ROSE
+        } else {
+            image = BitmapFactory.decodeStream(URL(iconUrl).content as InputStream)
+        }
 
 
         /* Get rid of end tags */
@@ -97,7 +105,7 @@ class MapParser(context: SongleContext) : BaseParser(context) {
         }
 
         /* Return */
-        return Style(id, scale, image)
+        return Style(id, scale, image, hue)
     }
 
     @Throws(XmlPullParserException::class, IOException::class)

@@ -8,6 +8,13 @@
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <SwitchPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:defaultValue="false"
+        android:key="mobileEnabled"
+        android:summary="If on, the game uses mobile data to connect, in addition to Wi-Fi"
+        android:title="Enable Mobile Data" />
     <EditTextPreference
         android:capitalize="words"
         android:defaultValue="-1"

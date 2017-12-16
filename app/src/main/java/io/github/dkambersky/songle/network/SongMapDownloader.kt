@@ -15,7 +15,9 @@ import java.net.URL
  * Experimental coroutine downloadXml class
  */
 class SongMapDownloader(private var songleContext: SongleContext,
-                        private var id: Int = -1, private var level: Int = -1, private val file: File) {
+                        private var id: Int = -1, private var level: Int = -1,
+                        private val file: File, private val offline: Boolean = false) {
+
     fun fetchMap(vararg urls: String): Deferred<Unit> {
         return async {
             urls.forEach {
@@ -59,7 +61,7 @@ class SongMapDownloader(private var songleContext: SongleContext,
         outWriter.close()
 
 
-        val map = MapParser(songleContext).parse(result.byteInputStream())
+        val map = MapParser(songleContext, offline).parse(result.byteInputStream())
 
         songleContext.maps.getOrPut(id, { mutableMapOf() }).put(level, map)
     }

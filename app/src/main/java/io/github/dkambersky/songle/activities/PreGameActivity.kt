@@ -2,6 +2,7 @@ package io.github.dkambersky.songle.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.text.Html
 import android.widget.Button
@@ -32,6 +33,29 @@ class PreGameActivity : BaseActivity() {
             b_includeSolved.isChecked = false
         }
 
+
+        /* Set default difficulty if specified */
+        val defaultDifficulty = PreferenceManager.getDefaultSharedPreferences(songle)
+                .getString("mobileEnabled", "-1").toInt()
+        if (defaultDifficulty in 1..3) {
+            switchDifficulty(when (defaultDifficulty) {
+                1 -> {
+                    Difficulty.EASY
+                }
+                2 -> {
+                    Difficulty.MEDIUM
+                }
+                3 -> {
+                    Difficulty.HARD
+                }
+                else -> {
+                    Difficulty.MEDIUM
+                }
+            })
+        }
+
+
+
         diffButtons = listOf(b_easy, b_med, b_hard)
 
         b_startGame.setOnClickListener { enterGame() }
@@ -52,7 +76,7 @@ class PreGameActivity : BaseActivity() {
 
 
     @SuppressLint("SetTextI18n")
-    private fun switchDifficulty(difficulty: Difficulty, button: Button) {
+    private fun switchDifficulty(difficulty: Difficulty, button: Button? = null) {
         this.difficulty = difficulty
         difficultyDescription.text = Html.fromHtml(
                 """Difficulty Selected: <b>$difficulty</b><br><br>
@@ -64,7 +88,7 @@ class PreGameActivity : BaseActivity() {
 
         /* Change button appearance */
         diffButtons.map { it.setTextColor(resources.getColor(R.color.blackOverlay, theme)) }
-        button.setTextColor(resources.getColor(R.color.white, theme))
+        button?.setTextColor(resources.getColor(R.color.white, theme))
 
     }
 

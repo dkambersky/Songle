@@ -21,8 +21,14 @@ class SongsDatabaseListener() : DownloadCompleteListener {
 
 
     override fun downloadComplete(result: String?) {
+        var songs: List<Song>?
         if (result == null) {
-            System.err.println("Database download failed!")
+            println("Downloading song database failed, attempting to load saved")
+            songs = loadSongs() ?: return
+            context.songs.addAll(songs)
+
+            /* Invoke callback, if specified*/
+            callback.invoke()
             return
         }
 
@@ -33,7 +39,7 @@ class SongsDatabaseListener() : DownloadCompleteListener {
         outWriter.flush()
         outWriter.close()
 
-        val songs = SongsParser(context).parse(result.byteInputStream()) ?: loadSongs()
+        songs = SongsParser(context).parse(result.byteInputStream()) ?: loadSongs() ?: return
 
         context.songs.addAll(songs)
 
@@ -42,9 +48,16 @@ class SongsDatabaseListener() : DownloadCompleteListener {
         callback.invoke()
     }
 
-    private fun loadSongs(): List<Song> {
-        return SongsParser(context)
-                .parse(FileInputStream(File(context.context.filesDir, "songs.xml")))!!
+    private fun loadSongs(): List<Song>? {
+        try {
+            return SongsParser(context)
+                    .parse(FileInputStream(File(context.context.filesDir, "songs.xml")))!!
+
+        } catch (e: Exception) {
+            System.err.println("Failed reading songs db file.")
+            return null
+        }
+
     }
 
 }

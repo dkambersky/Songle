@@ -1,5 +1,10 @@
 package io.github.dkambersky.songle.data
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.preference.PreferenceManager
 import io.github.dkambersky.songle.SongleApplication
 import io.github.dkambersky.songle.data.definitions.Placemark
 import io.github.dkambersky.songle.data.definitions.Song
@@ -8,6 +13,7 @@ import io.github.dkambersky.songle.network.SongLyricsDownloader
 import io.github.dkambersky.songle.network.SongMapDownloader
 import io.github.dkambersky.songle.network.listeners.SongsDatabaseListener
 import io.github.dkambersky.songle.storage.MapParser
+import io.github.dkambersky.songle.storage.SongsParser
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -19,35 +25,51 @@ import java.util.*
 
 /* Manages file downloads and storage */
 class DataManager(private val songle: SongleApplication,
-                  private val downloadsInProgress: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())) {
+                  private val downloadsInProgress: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())) : BroadcastReceiver() {
     private val fileClearedSongs: File = File(songle.filesDir, "clearedSongs.txt")
     private var inited = false
+    private var connection = ConnectionType.UNKNOWN
 
 
     suspend fun initialize() {
         if (!inited) {
             updateAndLoad()
-
             async {
                 while (true) {
                     if (inited) {
-                        println("Data inited")
                         return@async
                     }
                 }
             }.await()
-
         }
     }
 
 
-    private fun updateAndLoad() {
+    private fun updateAndLoad(): Boolean {
 
-        /* AsyncTask holdover */
-        DownloadXmlTask(SongsDatabaseListener(songle.context, {
+        if (connection == ConnectionType.ONLINE) {
+            /* AsyncTask holdover */
+            DownloadXmlTask(
+                    SongsDatabaseListener(
+                            songle.context,
+                            { fetchAllLyrics() }
+                    )
+            ).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+            return true
+        } else {
+            val dbFile = File(songle.context.context.filesDir, "songs.xml")
+            if (!dbFile.exists()) {
+                return false
+            }
+
+            songle.context.songs.addAll(
+                    SongsParser(songle.context)
+                            .parse(FileInputStream(dbFile))!!
+            )
             fetchAllLyrics()
-        }))
-                .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+            return true
+        }
+
 
     }
 
@@ -91,6 +113,8 @@ class DataManager(private val songle: SongleApplication,
 
 
     private fun fetchSongMapStep() {
+        val offline = connection == ConnectionType.OFFLINE || connection == ConnectionType.UNKNOWN
+        println("Downloading offline? $offline")
 
         /* Get next missing song */
         val nextSong: Song
@@ -119,7 +143,7 @@ class DataManager(private val songle: SongleApplication,
                 downloadsInProgress.add(file.canonicalPath)
                 launch {
                     println("Loading map from file $file")
-                    val map = loadMap(file).await()
+                    val map = loadMap(file, offline).await()
                     songle.context.maps.getOrPut(nextSong.id().toInt(), { mutableMapOf() }).put(level, map)
 
                     finishMapDownload(file.canonicalPath)
@@ -138,7 +162,8 @@ class DataManager(private val songle: SongleApplication,
                         songle.context,
                         nextSong.num,
                         level,
-                        file
+                        file,
+                        offline
                 ).fetchMap(url).await()
                 finishMapDownload(url)
 
@@ -154,8 +179,8 @@ class DataManager(private val songle: SongleApplication,
 
     }
 
-    private fun loadMap(file: File): Deferred<List<Placemark>> {
-        return async { MapParser(songle.context).parse(FileInputStream(file)) }
+    private fun loadMap(file: File, offline: Boolean = false): Deferred<List<Placemark>> {
+        return async { MapParser(songle.context, offline).parse(FileInputStream(file)) }
     }
 
     private fun loadLyrics(file: File, id: Int) {
@@ -201,12 +226,43 @@ class DataManager(private val songle: SongleApplication,
         }
         val clearedIds = fileClearedSongs.reader().readLines().map { it.toInt() }
 
+        inited = true
         for (id in clearedIds) {
-            songle.context.clearedSongs.add(songle.context.songs.first { it.num == id })
+            songle.context.clearedSongs.add(songle.context.songs.firstOrNull { it.num == id } ?: return)
         }
         println("Cleared: $clearedIds ")
-        inited = true
 
 
     }
+
+    /* Track connectivity changes */
+    override fun onReceive(context: Context, intent: Intent) {
+
+        val connMgr =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE)
+                        as ConnectivityManager
+        val networkInfo = connMgr.activeNetworkInfo
+
+        val mobileEnabled = PreferenceManager.getDefaultSharedPreferences(songle)
+                .getBoolean("mobileEnabled", false)
+
+        connection = when {
+            networkInfo?.type == ConnectivityManager.TYPE_WIFI -> {
+                ConnectionType.ONLINE
+            }
+            networkInfo?.type == ConnectivityManager.TYPE_MOBILE && mobileEnabled -> {
+                ConnectionType.ONLINE
+            }
+            else -> {
+                ConnectionType.OFFLINE
+            }
+        }
+        println("Switching connection state to $connection")
+    }
+
+}
+
+
+enum class ConnectionType {
+    ONLINE, OFFLINE, UNKNOWN
 }

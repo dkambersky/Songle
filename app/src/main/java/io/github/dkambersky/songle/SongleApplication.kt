@@ -12,4 +12,6 @@ class SongleApplication : Application() {
     lateinit var context: SongleContext
     lateinit var data: DataManager
     var inited = false
+
+
 }

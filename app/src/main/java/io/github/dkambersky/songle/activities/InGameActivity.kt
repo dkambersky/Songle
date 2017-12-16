@@ -375,7 +375,6 @@ class InGameActivity : MapActivity() {
         )
     }
 
-
     /* UI functionality */
     private fun handleGuessDialogInput(keyCode: Int, event: KeyEvent): Boolean {
         if ((event.action == KeyEvent.ACTION_DOWN) &&
