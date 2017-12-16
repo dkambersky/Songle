@@ -15,6 +15,7 @@ import java.net.URL
  */
 class SongLyricsDownloader(private var songleContext: SongleContext, private val id: Int, private val file: File) {
     fun fetchLyrics(vararg urls: String): Deferred<Unit> {
+        println("Fetching $urls")
         return async {
             urls.forEach {
                 val lyrics = downloadTxt(it).await()

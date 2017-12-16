@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import com.google.android.gms.common.ConnectionResult
@@ -32,8 +31,9 @@ abstract class MapActivity : BaseActivity(),
 
     protected lateinit var map: GoogleMap
     protected lateinit var apiClient: GoogleApiClient
-
     protected var lastLocation: Location? = null
+
+    private val locPermissionNum: Int = 5
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,27 +60,6 @@ abstract class MapActivity : BaseActivity(),
         initLocServices()
     }
 
-
-    /* Try requesting permissions */
-    private fun initLocServices() {
-        try {
-            // Visualise current position with a small blue circle
-            map.isMyLocationEnabled = true
-        } catch (se: SecurityException) {
-            println("Security exception thrown [onMapReady]")
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 5)
-        }
-        // Add ”My location” button to the user interface
-        try {
-            map.isMyLocationEnabled = true
-        } catch (se: SecurityException) {
-            snack("You need to enable location permissions for the app to work properly!",
-                    length = Snackbar.LENGTH_INDEFINITE)
-        }
-
-
-    }
 
     /* Add a placemark*/
     protected fun addMarker(point: Placemark) {
@@ -121,7 +100,7 @@ abstract class MapActivity : BaseActivity(),
         return LatLng(latitude, longitude)
     }
 
-    private fun Location.distanceTo(latLng: LatLng): Float {
+    fun Location.distanceTo(latLng: LatLng): Float {
         val other = Location("")
         other.longitude = latLng.longitude
         other.latitude = latLng.latitude
@@ -188,6 +167,39 @@ abstract class MapActivity : BaseActivity(),
         super.onStop()
         if (apiClient.isConnected) {
             apiClient.disconnect()
+        }
+    }
+
+
+    /* Try requesting permissions */
+    private fun initLocServices() {
+        try {
+            // Visualise current position with a small blue circle
+            map.isMyLocationEnabled = true
+        } catch (se: SecurityException) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), locPermissionNum)
+        }
+
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            locPermissionNum -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        createLocationRequest()
+                    }
+                } else {
+                    showSnackbar("You need to enable location permissions for the app to work properly.",
+                            length = 5000)
+                }
+                return
+            }
         }
     }
 }

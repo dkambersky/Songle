@@ -35,6 +35,8 @@ abstract class BaseActivity : AppCompatActivity() {
                 .getDefaultSharedPreferences(songle)
                 .getBoolean("fullscreen", true)) {
             enterFullscreen()
+        } else {
+            leaveFullscreen()
         }
 
     }
@@ -50,6 +52,15 @@ abstract class BaseActivity : AppCompatActivity() {
         supportActionBar?.hide()
     }
 
+    private fun leaveFullscreen() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN, WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        window.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE
+        actionBar?.show()
+        supportActionBar?.show()
+    }
+
     /* Activity Transitions */
     fun <T> transition(activity: Class<T>, vararg data: Pair<String, Serializable>): Boolean where T : Activity {
         val intent = Intent(this, activity)
@@ -61,7 +72,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     /* Common snackBar methods */
-    fun snack(message: String, length: Int = Snackbar.LENGTH_LONG): Snackbar {
+    fun showSnackbar(message: String, length: Int = Snackbar.LENGTH_LONG): Snackbar {
         val rootView = this.window.decorView.findViewById<View>(android.R.id.content)
         val bar = Snackbar.make(rootView, message, length)
 
@@ -71,7 +82,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
 
-    fun snack(message: Spanned, length: Int = Snackbar.LENGTH_LONG): Snackbar {
+    fun showSnackbar(message: Spanned, length: Int = Snackbar.LENGTH_LONG): Snackbar {
 
         val rootView = this.window.decorView.findViewById<View>(android.R.id.content)
         val bar = Snackbar.make(rootView, message, length)

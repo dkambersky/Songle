@@ -68,6 +68,9 @@ class InGameActivity : MapActivity() {
             toggleVisibility(nameInputField)
             toggleVisibility(t_guessInfo)
             revievView.visibility = View.GONE
+            if(nameInputField.visibility == View.VISIBLE){
+                nameInputField.requestFocus()
+            }
         }
 
     }
@@ -157,7 +160,7 @@ class InGameActivity : MapActivity() {
     /* Game functionality */
     private fun upgradeMapToLevel(level: Int) {
         if (level > 5) return
-        snack(Html.fromHtml("Map level increasing to <b>$level</b>"), length = 4000)
+        showSnackbar(Html.fromHtml("Map level increasing to <b>$level</b>"), length = 4000)
         println("Upgrading map to level $level!")
 
         /* Clean up */
@@ -289,7 +292,7 @@ class InGameActivity : MapActivity() {
 
 
     private fun collect(placemark: Placemark) {
-        snack(Html.fromHtml("Collected '<b>${placemark.text(song.lyrics)}</b>'"))
+        showSnackbar(Html.fromHtml("Collected '<b>${placemark.text(song.lyrics)}</b>'"))
         placemark.marker?.remove()
         gameMap.remove(placemark)
 
@@ -389,7 +392,7 @@ class InGameActivity : MapActivity() {
     private fun updateGuessCounter() {
         t_guessInfo.text = "Guesses left: ${if (gameState.guessesLeft == -1) "∞" else gameState.guessesLeft.toString()}"
         if (gameState.guessesLeft != -1) {
-            snack(Html.fromHtml("Guesses left: <b>${gameState.guessesLeft}</b>"))
+            showSnackbar(Html.fromHtml("Guesses left: <b>${gameState.guessesLeft}</b>"))
         }
     }
 

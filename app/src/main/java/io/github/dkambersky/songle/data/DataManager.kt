@@ -16,6 +16,7 @@ import io.github.dkambersky.songle.storage.MapParser
 import io.github.dkambersky.songle.storage.SongsParser
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.io.FileInputStream
@@ -32,12 +33,14 @@ class DataManager(private val songle: SongleApplication,
 
 
     suspend fun initialize() {
+        println("Initialize data starting")
         if (!inited) {
             updateAndLoad()
             async {
                 while (true) {
+                    delay(200)
                     if (inited) {
-                        return@async
+                        return@async 5
                     }
                 }
             }.await()
@@ -45,9 +48,11 @@ class DataManager(private val songle: SongleApplication,
     }
 
 
-    private fun updateAndLoad(): Boolean {
+    private fun updateAndLoad() {
+        onReceive(songle, Intent())
 
         if (connection == ConnectionType.ONLINE) {
+            println("Downloading over internet.")
             /* AsyncTask holdover */
             DownloadXmlTask(
                     SongsDatabaseListener(
@@ -55,11 +60,13 @@ class DataManager(private val songle: SongleApplication,
                             { fetchAllLyrics() }
                     )
             ).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
-            return true
+            return
         } else {
+            println("Trying to load from storage.")
             val dbFile = File(songle.context.context.filesDir, "songs.xml")
             if (!dbFile.exists()) {
-                return false
+                println("No song database file found.")
+                return
             }
 
             songle.context.songs.addAll(
@@ -67,20 +74,32 @@ class DataManager(private val songle: SongleApplication,
                             .parse(FileInputStream(dbFile))!!
             )
             fetchAllLyrics()
-            return true
+            return
         }
 
 
     }
 
     private fun fetchAllLyrics() {
+        println("Starting lyrics download, songs has ${songle.context.songs.size} entries")
 
         val jobs = mutableListOf<Deferred<Int>>()
 
         /* Fetch lyrics in parallel */
         songle.context.songs.forEach {
-            jobs += async { fetchSongLyrics(it) }
+            println("Trying to download $it")
+            try {
+                jobs += async {
+                    fetchSongLyrics(it)
+                }
+                println("I guess")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            println("Lmao")
         }
+        println("Nope")
+        jobs.forEach { print("$it, ${it.isActive}, ${it.isCompletedExceptionally}, ${it.isCancelled}") }
 
         /* After all lyrics are fetched, fetch maps */
         launch {
@@ -93,7 +112,7 @@ class DataManager(private val songle: SongleApplication,
     }
 
     private suspend fun fetchSongLyrics(song: Song): Int {
-
+        println("Fetch")
         val file = File(songle.filesDir, "${song.id()}.lyrics")
 
         if (file.isFile) {
@@ -102,6 +121,7 @@ class DataManager(private val songle: SongleApplication,
             return song.num
         }
 
+        println("Spawning lyrics downloader for $song")
         SongLyricsDownloader(
                 songle.context,
                 song.num,
@@ -221,12 +241,13 @@ class DataManager(private val songle: SongleApplication,
     }
 
     private fun loadClearedSongs() {
+        inited = true
         if (!fileClearedSongs.isFile) {
             return
         }
         val clearedIds = fileClearedSongs.reader().readLines().map { it.toInt() }
 
-        inited = true
+
         for (id in clearedIds) {
             songle.context.clearedSongs.add(songle.context.songs.firstOrNull { it.num == id } ?: return)
         }

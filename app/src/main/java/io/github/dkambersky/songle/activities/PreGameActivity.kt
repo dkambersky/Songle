@@ -67,7 +67,7 @@ class PreGameActivity : BaseActivity() {
                     Pair("Difficulty", difficulty!!),
                     Pair("Song", getSong()))
         } else {
-            snack("Please select a difficulty", Snackbar.LENGTH_SHORT)
+            showSnackbar("Please select a difficulty", Snackbar.LENGTH_SHORT)
         }
     }
 

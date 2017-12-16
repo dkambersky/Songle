@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:defaultValue="false"
         android:key="mobileEnabled"
-        android:summary="If on, the game uses mobile data to connect, in addition to Wi-Fi"
+        android:summary="If on, the game uses mobile data to connect, in addition to Wi-Fi. Takes effect on restart."
         android:title="Enable Mobile Data" />
     <EditTextPreference
         android:capitalize="words"
