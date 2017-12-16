@@ -17,14 +17,20 @@ class MainScreenActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_screen)
 
-        /* Initialize songleContext */
-        songle.context = SongleContext(mutableListOf(), Collections.synchronizedMap(mutableMapOf()), Collections.synchronizedMap(mutableMapOf()), applicationContext, mutableSetOf(), "")
-        songle.data = DataManager(songle)
+        /* Initialize application */
+        if (!songle.inited) {
+            songle.context = SongleContext(mutableListOf(), Collections.synchronizedMap(mutableMapOf()), Collections.synchronizedMap(mutableMapOf()), applicationContext, mutableSetOf(), "")
+            songle.data = DataManager(songle)
+            songle.inited = true
+        }
+
 
         /* Register listeners, set up UI */
         b_exit.setOnClickListener({ transition(PreGameActivity::class.java) })
+        b_leaderboard.setOnClickListener { transition(OverallProgressActivity::class.java) }
         b_settings.setOnClickListener({ transition(SettingsActivity::class.java) })
         b_about.setOnClickListener({ transition(AboutActivity::class.java) })
+
 
         b_exit.isEnabled = false
 

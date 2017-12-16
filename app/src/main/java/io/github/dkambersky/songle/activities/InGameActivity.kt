@@ -359,6 +359,7 @@ class InGameActivity : MapActivity() {
     }
 
     private fun endGameVictory() {
+        songle.data.saveClearedSong(song)
         transition(
                 GameSummaryActivity::class.java,
                 Pair("song", song.num),

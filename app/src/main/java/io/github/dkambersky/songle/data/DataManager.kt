@@ -14,12 +14,15 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileWriter
 import java.lang.StringBuilder
 import java.util.*
 
 /* Manages file downloads and storage */
 class DataManager(private val songle: SongleApplication,
                   private val downloadsInProgress: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())) {
+    private val fileClearedSongs: File = File(songle.filesDir, "clearedSongs.txt")
+
 
     fun initialize() {
         updateAndLoad()
@@ -86,6 +89,7 @@ class DataManager(private val songle: SongleApplication,
         } catch (e: NoSuchElementException) {
             /* Return if everything is downloaded */
             println("Completed fetching all songs")
+            loadClearedSongs()
             return
         }
 
@@ -128,11 +132,8 @@ class DataManager(private val songle: SongleApplication,
                 finishMapDownload(url)
 
             }
-
         }
-
     }
-
 
     private fun finishMapDownload(url: String) {
         downloadsInProgress.remove(url)
@@ -169,5 +170,36 @@ class DataManager(private val songle: SongleApplication,
 
         fetchSongMapStep()
 //        b_newGame.isEnabled = true
+    }
+
+    fun saveClearedSong(song: Song) {
+        println("Adding $song to cleared")
+        songle.context.clearedSongs.add(song)
+
+        saveClearedSongs()
+    }
+
+    private fun saveClearedSongs() {
+        val outWriter = FileWriter(fileClearedSongs)
+        for (song in songle.context.clearedSongs) {
+            outWriter.write(song.num.toString() + "\n")
+        }
+
+        outWriter.flush()
+        outWriter.close()
+
+    }
+
+    private fun loadClearedSongs() {
+        if (!fileClearedSongs.isFile) {
+            return
+        }
+        val clearedIds = fileClearedSongs.reader().readLines().map { it.toInt() }
+
+        for (id in clearedIds) {
+            songle.context.clearedSongs.add(songle.context.songs.first { it.num == id })
+        }
+        println("Cleared: $clearedIds ")
+
     }
 }

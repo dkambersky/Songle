@@ -11,4 +11,5 @@ import io.github.dkambersky.songle.data.definitions.SongleContext
 class SongleApplication : Application() {
     lateinit var context: SongleContext
     lateinit var data: DataManager
+    var inited = false
 }
