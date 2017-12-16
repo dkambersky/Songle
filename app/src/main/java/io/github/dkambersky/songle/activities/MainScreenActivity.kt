@@ -36,14 +36,13 @@ class MainScreenActivity : BaseActivity() {
         b_about.setOnClickListener({ transition(AboutActivity::class.java) })
 
 
-        b_exit.isEnabled = false
-
         /* Load data */
         if (!songle.inited)
             initialize()
     }
 
     private fun initialize() {
+        b_exit.isEnabled = false
         snackbarAlert = snack("Hang tight! Checking for updates.", Snackbar.LENGTH_INDEFINITE)
 
         /* Register DataManager for connection tracking */

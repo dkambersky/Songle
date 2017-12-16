@@ -33,10 +33,12 @@ class PreGameActivity : BaseActivity() {
             b_includeSolved.isChecked = false
         }
 
+        diffButtons = listOf(b_easy, b_med, b_hard)
 
         /* Set default difficulty if specified */
         val defaultDifficulty = PreferenceManager.getDefaultSharedPreferences(songle)
-                .getString("mobileEnabled", "-1").toInt()
+                .getString("defaultDifficulty", "-1").toIntOrNull() ?: -1
+
         if (defaultDifficulty in 1..3) {
             switchDifficulty(when (defaultDifficulty) {
                 1 -> {
@@ -54,12 +56,7 @@ class PreGameActivity : BaseActivity() {
             })
         }
 
-
-
-        diffButtons = listOf(b_easy, b_med, b_hard)
-
         b_startGame.setOnClickListener { enterGame() }
-
 
     }
 

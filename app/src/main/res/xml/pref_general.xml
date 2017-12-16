@@ -3,7 +3,7 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="fullscreen"
-        android:summary="Whether the game runs in full-screen mode."
+        android:summary="Whether the game runs in full-screen mode. Takes effect on restart."
         android:title="Enable Fullscreen" />
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
