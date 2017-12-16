@@ -1,17 +1,19 @@
 package io.github.dkambersky.songle.activities
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.R
 import io.github.dkambersky.songle.data.DataManager
 import io.github.dkambersky.songle.data.definitions.SongleContext
 import kotlinx.android.synthetic.main.activity_main_screen.*
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 
 class MainScreenActivity : BaseActivity() {
-
+    private lateinit var snackbarAlert: Snackbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,10 +42,22 @@ class MainScreenActivity : BaseActivity() {
 
 
     private fun initialize() {
+        snackbarAlert = snack("Hang tight! Checking for updates.", Snackbar.LENGTH_INDEFINITE)
         /* Launch non-blocking init co-routine */
-        launch {
-            async { songle.data.initialize() }.await()
-            b_exit.isEnabled = true
+        runOnUiThread {
+            launch(UI) {
+                async(UI) {
+                    songle.data.initialize()
+                }.await()
+                println("Loading data finished.")
+                snackbarAlert.dismiss()
+                b_exit.isEnabled = true
+
+
+            }
+
         }
     }
+
+
 }

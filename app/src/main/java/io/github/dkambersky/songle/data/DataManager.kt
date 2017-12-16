@@ -1,6 +1,5 @@
 package io.github.dkambersky.songle.data
 
-import android.support.design.widget.Snackbar
 import io.github.dkambersky.songle.SongleApplication
 import io.github.dkambersky.songle.data.definitions.Placemark
 import io.github.dkambersky.songle.data.definitions.Song
@@ -22,18 +21,30 @@ import java.util.*
 class DataManager(private val songle: SongleApplication,
                   private val downloadsInProgress: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())) {
     private val fileClearedSongs: File = File(songle.filesDir, "clearedSongs.txt")
+    private var inited = false
 
 
-    fun initialize() {
-        updateAndLoad()
+    suspend fun initialize() {
+        if (!inited) {
+            updateAndLoad()
+
+            async {
+                while (true) {
+                    if (inited) {
+                        println("Data inited")
+                        return@async
+                    }
+                }
+            }.await()
+
+        }
     }
 
 
     private fun updateAndLoad() {
-//        val snackbarUpdating = snack("Hang tight! Checking for updates.", Snackbar.LENGTH_INDEFINITE)
 
+        /* AsyncTask holdover */
         DownloadXmlTask(SongsDatabaseListener(songle.context, {
-            //            snackShowFinished(snackbarUpdating)
             fetchAllLyrics()
         }))
                 .execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
@@ -165,12 +176,6 @@ class DataManager(private val songle: SongleApplication,
         songle.context.songs[id].lyrics = lyrics
     }
 
-    private fun snackShowFinished(snackbarUpdating: Snackbar) {
-        snackbarUpdating.dismiss()
-
-        fetchSongMapStep()
-//        b_newGame.isEnabled = true
-    }
 
     fun saveClearedSong(song: Song) {
         println("Adding $song to cleared")
@@ -200,6 +205,8 @@ class DataManager(private val songle: SongleApplication,
             songle.context.clearedSongs.add(songle.context.songs.first { it.num == id })
         }
         println("Cleared: $clearedIds ")
+        inited = true
+
 
     }
 }
