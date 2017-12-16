@@ -49,13 +49,13 @@ class SongsDatabaseListener() : DownloadCompleteListener {
     }
 
     private fun loadSongs(): List<Song>? {
-        try {
-            return SongsParser(context)
+        return try {
+            SongsParser(context)
                     .parse(FileInputStream(File(context.context.filesDir, "songs.xml")))!!
 
         } catch (e: Exception) {
             System.err.println("Failed reading songs db file.")
-            return null
+            null
         }
 
     }

@@ -15,7 +15,6 @@ import java.net.URL
  */
 class SongLyricsDownloader(private var songleContext: SongleContext, private val id: Int, private val file: File) {
     fun fetchLyrics(vararg urls: String): Deferred<Unit> {
-        println("Fetching $urls")
         return async {
             urls.forEach {
                 val lyrics = downloadTxt(it).await()
@@ -39,7 +38,6 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
             result
         }
     }
-
 
     private suspend fun processLyrics(result: String) {
         /* Save the downloaded lyrics into a file */
@@ -79,6 +77,5 @@ class SongLyricsDownloader(private var songleContext: SongleContext, private val
         return sb.toString()
 
     }
-
 
 }
